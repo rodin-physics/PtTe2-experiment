@@ -1,4 +1,4 @@
-include("general.jl")
+include("main.jl")
 
 struct LocalPotential           # This is Dirac potential
     V::Float64                  # Additive potential
