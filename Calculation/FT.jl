@@ -4,7 +4,7 @@ xs = reduce(vcat, XS)
 ys = reduce(vcat, YS)
 X = d1[1] .* xs + d2[1] .* ys
 Y = d1[2] .* xs + d2[2] .* ys
-res = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), XS, YS)
+# res = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), XS, YS)
 signal = reduce(vcat, res)
 XS = reshape(X, 1, (2*x_pos+1)^2)
 YS = reshape(Y, 1, (2*x_pos+1)^2)
@@ -13,8 +13,8 @@ signal1 = signal1 .- signal1[1]
 function FT_component(qx, qy, ρ, XS, YS)
     res = sum(map((x, y, z) -> exp(1im * (x * qx + y * qy)) * z, XS, YS, ρ))
 end
-qx_min = -1 * π;
-qx_max = 1 * π;
+qx_min = -2 * π / lattice_constant;
+qx_max = 2 * π / lattice_constant;
 
 n_pts = 200;
 

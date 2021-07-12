@@ -17,8 +17,8 @@ const d1 = [lattice_constant / 2, lattice_constant * √(3) / 2]
 const d2 = [-lattice_constant / 2, lattice_constant * √(3) / 2]
 
 # Effective mass in the armchair(x) and zigzag(y) direction in m_e
-const mx = 0.15
-const my = 1.18
+const mx = 0.1
+const my = 1.4
 
 # Area of the unit cell in Bohr radii squared
 const UC_area = d1[1] * d2[2] - d1[2] * d2[1];
