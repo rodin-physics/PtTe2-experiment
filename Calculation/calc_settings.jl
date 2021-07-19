@@ -14,6 +14,7 @@ xs = -x_pos:x_pos
 #slice energy
 ω = 0.05
 
+
 # Coordinates of the UC's
 XS = repeat(xs, 1, length(xs))
 YS = permutedims(XS)
@@ -25,29 +26,46 @@ YS = permutedims(XS)
 ωs = range(ω_min, ω_max, length = nPts)
 
 # Plotting for different values of the potential
-Delta_1 = LocalPotential(-1, Location(-0, 0))
+Delta_1 = LocalPotential(-1, Location(0, 0))
 Delta_2 = LocalPotential(-1.5, Location(0, 0))
 Delta_3 = LocalPotential(-2.6, Location(0, 1))
 #List of local potentials to simulate the charged and neutral SVs
 U_val1 = -1.5
-U_val2 = -0.4
-
-# POTENTIAL = [Delta_2, Delta_3]
-
-# POTENTIAL = [LocalPotential(U_val1, Location(0,-1)), LocalPotential(U_val1, Location(0,1)), LocalPotential(U_val1, Location(2,-1)),LocalPotential(0.2, Location(0,0)), LocalPotential(0.2, Location(1,-1)),LocalPotential(0.2, Location(1,0))]
-
-# POTENTIAL = [LocalPotential(-0.5, Location(1,1)), LocalPotential(-0.5, Location(1,-2)), LocalPotential(-0.5, Location(-2,1)), LocalPotential(-1.5, Location(0,0))]
-
-# POTENTIAL = [LocalPotential(U_val, Location(-1,0)), LocalPotential(U_val, Location(0,-1)), LocalPotential(U_val, Location(-1,-1)),LocalPotential(U_val, Location(0,1)), LocalPotential(U_val, Location(-1,2)), LocalPotential(U_val, Location(-1,1)),LocalPotential(U_val, Location(1,0)), LocalPotential(U_val, Location(2,-1)), LocalPotential(U_val, Location(1,-1))]
-
-POTENTIAL = [LocalPotential(-1.5, Location(0,0)), LocalPotential(-1.5,   Location(0,-1)), LocalPotential(-1.5, Location(-1,0)),
-LocalPotential(-0.5, Location(-2,0)), LocalPotential(-0.5, Location(0,-2)), LocalPotential(-0.5, Location(-1,1)),LocalPotential(-0.5, Location(1,0)),LocalPotential(-0.5, Location(0,1)),LocalPotential(-0.5, Location(1,-1)),LocalPotential(-0.5, Location(-2,1)), LocalPotential(-0.5, Location(1,0)),LocalPotential(-0.5, Location(0,1)), LocalPotential(-0.5, Location(-1,-1)), LocalPotential(-0.5, Location(1,-2))]
+U_val2 = -0.2
 
 
-# POTENTIAL = [LocalPotential(U_val, Location(-2,0)), LocalPotential(U_val, Location(0,0)), LocalPotential(U_val, Location(2,0)), LocalPotential(U_val, Location(-2,2)), LocalPotential(U_val, Location(0,2)), LocalPotential(U_val, Location(-2,4))]
+## Base units for vacancy clusters
+small_triangle_base = [Location(0,0), Location(0,1), Location(1,0)]
 
-# POTENTIAL = [LocalPotential(U_val, Location(-2,-1)), LocalPotential(U_val, Location(0,-1)), LocalPotential(U_val, Location(2,-1)), LocalPotential(U_val, Location(-2,1)), LocalPotential(U_val, Location(0,1)), LocalPotential(U_val, Location(-2,3))]
+some_2NNs_base = vcat(small_triangle_base,[Location(-1,0), Location(0,-1), Location(0,2), Location(-1,2), Location(2,0), Location(2,-1)])
 
-# POTENTIAL = [LocalPotential(U_val, Location(-2,-1)), LocalPotential(U_val, Location(0,-1)), LocalPotential(U_val, Location(2,-1)), LocalPotential(U_val, Location(-2,1)), LocalPotential(U_val, Location(0,1)), LocalPotential(U_val, Location(-2,3)), LocalPotential(U_val, Location(-2,5)), LocalPotential(U_val, Location(0,3)), LocalPotential(U_val, Location(2,1)), LocalPotential(U_val, Location(4,-1))]
+all_2NNs_base = vcat(small_triangle_base, [Location(-1,0), Location(0,-1), Location(0,2), Location(-1,2), Location(2,0), Location(2,-1), Location(1,1), Location(-1,1), Location(1,-1)])
+
+
+## Function to place potentials in correct UCs
+function make_shape(U1::Float64, U2::Float64, shape::Int64, base_unit::Vector{Location})
+    vec = [Location(0,0), Location(2,0), Location(0,2), Location(4,0), Location(0,4), Location(2,2), Location(6,0), Location(0,6), Location(4,2), Location(2,4)]
+
+    shift = shape ÷ -5
+
+    vec = vec .+ [Location(shift, shift)]
+
+    if length(base_unit) == 3 || length(base_unit) == 4
+        pot = vcat(map(y -> map(x -> LocalPotential(U1, x), base_unit.+ [y]), vec[1:shape])...)
+        return pot
+
+    else
+        first = base_unit[1:3]
+        second = base_unit[3:end]
+        pot1 = vcat(map(y -> map(x -> LocalPotential(U1, x), first.+ [y]), vec[1:shape])...)
+        pot2 = vcat(map(y -> map(x -> LocalPotential(U2, x), second .+ [y]), vec[1:shape])...)
+        return vcat(pot1, pot2)
+    end
+end
+
+
+# Use 1 - SV, 3 - trimer, 6 - hexamer, 10 - decamer
+POTENTIAL = make_shape(U_val1, U_val2, 10, small_triangle_base)
+
 
 s = AtomsSystem(μ, T, POTENTIAL)

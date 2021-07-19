@@ -12,7 +12,7 @@ ys = reduce(vcat, YS)
 #x and y axis of the spectral map
 X = d1[1] .* xs + d2[1] .* ys
 Y = d1[2] .* xs + d2[2] .* ys
-res = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), XS, YS) #Computation, Get the results
+# res = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), XS, YS) #Computation, Get the results
 signal = reduce(vcat, res)
 
 x_positions2 = map(y -> y.loc.v1, POTENTIAL)
@@ -22,7 +22,7 @@ X_LP = d1[1] .* x_positions2 + d2[1] .* y_positions2
 Y_LP = d1[2] .* x_positions2 + d2[2] .* y_positions2
 
 
-fig = Figure(resolution = (1600, 1600))
+fig = Figure(resolution = (1800, 1800))
 ax =
     fig[1, 1] = Axis(
         fig,
@@ -30,16 +30,18 @@ ax =
         ylabel = "y/nm",
         xlabelpadding = 0,
         ylabelpadding = 0,
-        xlabelsize = 16,
-        ylabelsize = 16,
+        xlabelsize = 12,
+        ylabelsize = 12,
         title = "FO map - $ω eV",
-        xticklabelsize = 14,
-        yticklabelsize = 14,
+        titlefont = "LibreBaskerville-Regular.ttf",
+        titlesize = 12,
+        xticklabelsize = 11,
+        yticklabelsize = 11,
         aspect = DataAspect(),
-        xticklabelfont = "serif-roman",
-        yticklabelfont = "serif-roman",
-        xlabelfont = "serif-italic",
-        ylabelfont = "serif-italic",
+        xticklabelfont = "LibreBaskerville-Regular.ttf",
+        yticklabelfont = "LibreBaskerville-Regular.ttf",
+        xlabelfont = "LibreBaskerville-Italic.ttf",
+        ylabelfont = "LibreBaskerville-Italic.ttf",
     )
 
 sc = CairoMakie.scatter!(
@@ -50,9 +52,9 @@ sc = CairoMakie.scatter!(
     strokewidth = 0,
     # marker = '◼',
     marker = :hexagon,
-    markersize = 6.8,
+    markersize = 7.1,
     colormap = :bwr,
-    colorrange = (-.2, 0.2),
+    colorrange = (-0.45, 0.45),
 )
 
 
@@ -61,18 +63,12 @@ sc = CairoMakie.scatter!(
     ax,
     X_LP .* a0 / 10,
     Y_LP .* a0 / 10,
-    marker = :circle,
-    markersize = 1,
-    color = :black
+    marker = :x,
+    markersize = 5,
+    color = :black ,
+    strokewidth = 0.4,
 )
 
-# sc = CairoMakie.scatter!(
-#     ax,
-#     [0],[0],
-#     marker = :circle,
-#     markersize = 1,
-#     color = :blue,
-# )
 
 tightlimits!(ax)
 CairoMakie.xlims!(ax, [-10, 10])

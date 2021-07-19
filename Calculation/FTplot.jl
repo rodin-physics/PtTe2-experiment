@@ -44,14 +44,19 @@ ax2 =
                 ylabelsize = 12,
                 xticklabelsize = 12,
                 yticklabelsize = 12,
+                title = "FT - $ω eV",
+                titlefont = "LibreBaskerville-Regular.ttf",
+                titlesize = 12,
                 aspect = AxisAspect(1),
-                xticklabelfont = "serif-roman",
-                yticklabelfont = "serif-roman",
-                xlabelfont = "serif-italic",
-                ylabelfont = "serif-italic",
+                xticklabelfont = "LibreBaskerville-Regular.ttf",
+                yticklabelfont = "LibreBaskerville-Regular.ttf",
+                xlabelfont = "LibreBaskerville-Italic.ttf",
+                ylabelfont = "LibreBaskerville-Italic.ttf",
         )
 
-hm2 = heatmap!(qx, qy, abs.(FT_res), colormap = :oslo)
-Colorbar(fig2[1, 2], hm2, width = 40)
+hm2 = heatmap!(qx, qy, abs.(FT_res),
+                colormap = :oslo,
+                colorrange = (0,15))
+Colorbar(fig2[1, 2], hm2, width =40)
 fig2
-save("FT_amplitude.pdf", fig2)
+# save("FT_amplitude.pdf", fig2)
