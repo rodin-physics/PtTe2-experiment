@@ -12,7 +12,7 @@ ys = reduce(vcat, YS)
 #x and y axis of the spectral map
 X = d1[1] .* xs + d2[1] .* ys
 Y = d1[2] .* xs + d2[2] .* ys
-# res = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), XS, YS) #Computation, Get the results
+res = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), XS, YS) #Computation, Get the results
 signal = reduce(vcat, res)
 
 x_positions2 = map(y -> y.loc.v1, POTENTIAL)
@@ -54,7 +54,7 @@ sc = CairoMakie.scatter!(
     marker = :hexagon,
     markersize = 7.1,
     colormap = :bwr,
-    colorrange = (-0.45, 0.45),
+    colorrange = (-0.00001, 0.000001),
 )
 
 

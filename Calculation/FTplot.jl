@@ -56,7 +56,7 @@ ax2 =
 
 hm2 = heatmap!(qx, qy, abs.(FT_res),
                 colormap = :oslo,
-                colorrange = (0,15))
+                colorrange = (0,70))
 Colorbar(fig2[1, 2], hm2, width =40)
 fig2
 # save("FT_amplitude.pdf", fig2)
