@@ -4,6 +4,12 @@ proc_number = 4;
 if nprocs() < proc_number
     addprocs(proc_number - nprocs())
 end
+#
+# @everywhere begin
+#     using ProgressMeter
+#     using Distributed
+# end
+
 @everywhere include("/Users/harshitramahalingam/Documents/CA2DM/PtTe2-experiment/Calculation/calc_settings.jl")
 ## Plotting
 # Convert X and Y to Bohr radii. Reshape the arrays
@@ -32,7 +38,7 @@ ax =
         ylabelpadding = 0,
         xlabelsize = 12,
         ylabelsize = 12,
-        title = "FO map - $ω eV",
+        title = "FO map at $ω eV",
         titlefont = "LibreBaskerville-Regular.ttf",
         titlesize = 12,
         xticklabelsize = 11,
@@ -53,8 +59,9 @@ sc = CairoMakie.scatter!(
     # marker = '◼',
     marker = :hexagon,
     markersize = 7.1,
+    # markersize = 14,
     colormap = :bwr,
-    colorrange = (-0.00001, 0.000001),
+    colorrange = (-0.35, 0.35),
 )
 
 
@@ -65,6 +72,7 @@ sc = CairoMakie.scatter!(
     Y_LP .* a0 / 10,
     marker = :x,
     markersize = 5,
+    # markersize = 10,
     color = :black ,
     strokewidth = 0.4,
 )

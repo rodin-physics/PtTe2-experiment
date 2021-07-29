@@ -5,14 +5,14 @@ include("../src/density.jl")
 T = 0.0             # Temperature
 
 nPts = 600;         # Number of points in the spectral function curve
-x_pos = 50;  # Number of unit cells to be plotted in positive x  direction for neutral SV
+x_pos = 80;  # Number of unit cells to be plotted in positive x  direction for neutral SV
 # y_pos = 10;        #Number of unit cells to be plotted in positive y direction for both SVs
 
 # Cut settings
 xs = -x_pos:x_pos
 
 #slice energy
-ω = -0.01
+ω = 0.05
 
 
 # Coordinates of the UC's
@@ -21,16 +21,16 @@ YS = permutedims(XS)
 
 
 # Energies used in the spectral function
-ω_min = -1.5;
-ω_max = 4.5;
+ω_min = -0.5;
+ω_max = 1.5;
 ωs = range(ω_min, ω_max, length = nPts)
 
 # Plotting for different values of the potential
 Delta_1 = LocalPotential(-0.5, Location(0, 0))
-Delta_2 = LocalPotential(-1.0, Location(0, 0))
+Delta_2 = LocalPotential(-1.0, Location(0, 1))
 Delta_3 = LocalPotential(-1.5, Location(0, 0))
 #List of local potentials to simulate the charged and neutral SVs
-U_val1 = -1.5
+U_val1 = -0.26
 U_val2 = -0.2
 
 
@@ -65,8 +65,7 @@ end
 
 
 # Use 1 - SV, 3 - trimer, 6 - hexamer, 10 - decamer
-# POTENTIAL = make_shape(U_val1, U_val2, 1, small_triangle_base)
-
-POTENTIAL = [Delta_3]
+POTENTIAL = make_shape(U_val1, U_val2, 1, small_triangle_base)
+# POTENTIAL = [Delta_1, Delta_2]
 
 s = AtomsSystem(μ, T, POTENTIAL)
