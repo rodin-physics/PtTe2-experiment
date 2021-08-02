@@ -12,7 +12,7 @@ x_pos = 80;  # Number of unit cells to be plotted in positive x  direction for n
 xs = -x_pos:x_pos
 
 #slice energy
-ω = 0.05
+ω = -0.16
 
 
 # Coordinates of the UC's
@@ -30,7 +30,7 @@ Delta_1 = LocalPotential(-0.5, Location(0, 0))
 Delta_2 = LocalPotential(-1.0, Location(0, 1))
 Delta_3 = LocalPotential(-1.5, Location(0, 0))
 #List of local potentials to simulate the charged and neutral SVs
-U_val1 = -0.26
+U_val1 = -0.2
 U_val2 = -0.2
 
 

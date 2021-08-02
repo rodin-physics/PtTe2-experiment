@@ -4,13 +4,9 @@ proc_number = 4;
 if nprocs() < proc_number
     addprocs(proc_number - nprocs())
 end
-#
-# @everywhere begin
-#     using ProgressMeter
-#     using Distributed
-# end
 
 @everywhere include("/Users/harshitramahalingam/Documents/CA2DM/PtTe2-experiment/Calculation/calc_settings.jl")
+
 ## Plotting
 # Convert X and Y to Bohr radii. Reshape the arrays
 xs = reduce(vcat, XS)
@@ -20,6 +16,7 @@ X = d1[1] .* xs + d2[1] .* ys
 Y = d1[2] .* xs + d2[2] .* ys
 res = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), XS, YS) #Computation, Get the results
 signal = reduce(vcat, res)
+final_signal = signal .- signal[1]
 
 x_positions2 = map(y -> y.loc.v1, POTENTIAL)
 y_positions2 = map(y -> y.loc.v2, POTENTIAL)
@@ -27,6 +24,11 @@ y_positions2 = map(y -> y.loc.v2, POTENTIAL)
 X_LP = d1[1] .* x_positions2 + d2[1] .* y_positions2
 Y_LP = d1[2] .* x_positions2 + d2[2] .* y_positions2
 
+if all(>=(0), final_signal)
+    color_lim = -findmax(final_signal)[1] / 10
+else
+    color_lim = findmin(final_signal)[1]
+end
 
 fig = Figure(resolution = (1800, 1800))
 ax =
@@ -61,7 +63,7 @@ sc = CairoMakie.scatter!(
     markersize = 7.1,
     # markersize = 14,
     colormap = :bwr,
-    colorrange = (-0.35, 0.35),
+    colorrange = (color_lim, -color_lim),
 )
 
 

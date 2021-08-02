@@ -8,7 +8,7 @@ end
 @everywhere include("/Users/harshitramahalingam/Documents/CA2DM/PtTe2-experiment/Calculation/calc_settings.jl")
 
 ## Calculation
-dI_dV = @showprogress pmap(x -> spectral_bulk(x, Location(0, 0), s), ωs)
+# dI_dV = @showprogress pmap(x -> spectral_bulk(x, Location(1, 1), s), ωs)
 
 ## Plotting
 fig = Figure(resolution = (1800, 1800))
@@ -36,6 +36,6 @@ ax =
 lineplot = lines!(ωs, dI_dV, color = :blue, linewidth = 2, label = "Center")
 
 CairoMakie.xlims!(ax, [-0.3, 0.1])
-CairoMakie.ylims!(ax, [0.0, 0.05])
+CairoMakie.ylims!(ax, [0.0, 0.7])
 
 fig
