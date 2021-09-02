@@ -1,5 +1,6 @@
 using CairoMakie
 using Distributed
+using Colors
 proc_number = 4;
 if nprocs() < proc_number
     addprocs(proc_number - nprocs())
@@ -7,27 +8,38 @@ end
 
 @everywhere include("/Users/harshitramahalingam/Documents/CA2DM/PtTe2-experiment/Calculation/calc_settings.jl")
 
-## Plotting
+## Testing parameters
+small_lattice = 7.604/3         # In Bohr radii
+small_d1 = [small_lattice / 2, small_lattice * √(3) / 2]
+small_d2 = [-small_lattice / 2, small_lattice * √(3) / 2]
+
+x_pos = 80
+xs = -x_pos:x_pos
+
+# Coordinates of the UC's
+XS = repeat(xs, 1, length(xs))
+YS = permutedims(XS)
+
 # Convert X and Y to Bohr radii. Reshape the arrays
 xs = reduce(vcat, XS)
 ys = reduce(vcat, YS)
-#x and y axis of the spectral map
+# x and y axis of the spectral map
 X = d1[1] .* xs + d2[1] .* ys
 Y = d1[2] .* xs + d2[2] .* ys
-# res = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), XS, YS) #Computation, Get the results
-signal = reduce(vcat, res)
 
+# Coordinates of small lattice
+X2 = small_d1[1] .* xs + small_d2[1] .* ys
+Y2 = small_d1[2] .* xs + small_d2[2] .* ys
+
+# Positions of local potentials for usual lattice
 x_positions2 = map(y -> y.loc.v1, POTENTIAL)
 y_positions2 = map(y -> y.loc.v2, POTENTIAL)
 
 X_LP = d1[1] .* x_positions2 + d2[1] .* y_positions2
 Y_LP = d1[2] .* x_positions2 + d2[2] .* y_positions2
 
-if all(>=(0), final_signal)
-    color_lim = -findmax(final_signal)[1] / 10
-else
-    color_lim = findmin(final_signal)[1]
-end
+
+## Plotting
 
 fig = Figure(resolution = (1800, 1800))
 ax =
@@ -39,7 +51,7 @@ ax =
         ylabelpadding = 0,
         xlabelsize = 20,
         ylabelsize = 20,
-        title = "FO map at $ω eV",
+        title = "Grid Comparison",
         titlefont = "LibreBaskerville-Regular.ttf",
         titlesize = 30,
         xticklabelsize = 18,
@@ -55,34 +67,37 @@ sc = CairoMakie.scatter!(
     ax,
     X .* a0 / 10,
     Y .* a0 / 10,
-    color = signal,
-    strokewidth = 0,
-    # marker = '◼',
+    strokewidth = 3.5,
     marker = :hexagon,
-    # markersize = 45,
-    markersize = 31,
-    colormap = :jet,
-    colorrange = (0.0, 0.000001)
-    # colorrange = (color_lim, -color_lim),
-)
+    strokecolor = :black,
+    color = :transparent,
+    markersize = 92,
+    )
 
-
+sc = CairoMakie.scatter!(
+    ax,
+    X2 .* a0 / 10,
+    Y2 .* a0 / 10,
+    strokewidth = 2.3,
+    marker = :hexagon,
+    strokecolor = :grey,
+    color = :transparent,
+    markersize = 30,
+    )
 
 sc = CairoMakie.scatter!(
     ax,
     X_LP .* a0 / 10,
     Y_LP .* a0 / 10,
-    marker = :x,
-    markersize = 30,
+    marker = :hexagon,
+    markersize = 90,
     # markersize = 10,
-    color = :black ,
-    strokewidth = 0.4,
-)
-
+    color = RGBA(0.0,0.0,0.0,0.3) ,
+    strokewidth = 0.0,
+    markeralpha = 0.3
+    )
 
 tightlimits!(ax)
 xlims!(ax, (-5.0, 5.0))
 ylims!(ax, (-5.0, 5.0))
 fig
-
-# save("Spectral_Single_Defect_005eV.pdf", fig)

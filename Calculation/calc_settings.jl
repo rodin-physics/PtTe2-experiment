@@ -30,7 +30,8 @@ Delta_1 = LocalPotential(-0.5, Location(0, 0))
 Delta_2 = LocalPotential(-1.0, Location(0, 1))
 Delta_3 = LocalPotential(-1.5, Location(0, 0))
 #List of local potentials to simulate the charged and neutral SVs
-U_val1 = -0.2
+# U_val1 = -0.27
+U_val1 = -0.8
 U_val2 = -0.2
 
 

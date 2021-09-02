@@ -11,7 +11,9 @@ const ħ = 1
 const ryd = 13.606              # Rydberg constant in eV
 const a0 = 0.529                # Bohr radius in angstroms
 
-const lattice_constant = 7.714  # In Bohr radii
+const lattice_constant = 7.604  # In Bohr radii
+const lattice_constant2 = 7.714/3  # In Bohr radii
+
 
 const d1 = [lattice_constant / 2, lattice_constant * √(3) / 2]
 const d2 = [-lattice_constant / 2, lattice_constant * √(3) / 2]
