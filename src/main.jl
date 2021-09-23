@@ -12,11 +12,13 @@ const ryd = 13.606              # Rydberg constant in eV
 const a0 = 0.529                # Bohr radius in angstroms
 
 const lattice_constant = 7.604  # In Bohr radii
-const lattice_constant2 = 7.714/3  # In Bohr radii
-
+const lattice_constant2 = 7.604/3  # In Bohr radii
 
 const d1 = [lattice_constant / 2, lattice_constant * √(3) / 2]
 const d2 = [-lattice_constant / 2, lattice_constant * √(3) / 2]
+
+const small_d1 = [lattice_constant2 / 2, lattice_constant2 * √(3) / 2]
+const small_d2 = [-lattice_constant2 / 2, lattice_constant2 * √(3) / 2]
 
 # Effective mass in the armchair(x) and zigzag(y) direction in m_e
 const mx = 0.1
@@ -54,6 +56,10 @@ function Base.:-(l1::Location, l2::Location)
     return Location(l1.v1 - l2.v1, l1.v2 - l2.v2)
 end
 
+function Base.:*(l1::Location, l2::Location)
+    return Location(l1.v1 * l2.v1, l1.v2 * l2.v2)
+end
+
 ## Propagator
 function P(r, z::ComplexF64)
     md = √(mx * r[1]^2 + my * r[2]^2)
@@ -64,8 +70,17 @@ function P(r, z::ComplexF64)
     end
 end
 
+# function Ξ(r::Location, z::ComplexF64)
+#     position = r.v1 * d1 + r.v2 * d2
+#     res =
+#         P(position, z) * cos(dot(position, M)) +
+#         P(Rot_Mat' * position, z) * cos(dot(position, Rot_Mat * M)) +
+#         P(Rot_Mat * position, z) * cos(dot(position, Rot_Mat' * M))
+#     return res
+# end
+
 function Ξ(r::Location, z::ComplexF64)
-    position = r.v1 * d1 + r.v2 * d2
+    position = r.v1 * small_d1 + r.v2 * small_d2
     res =
         P(position, z) * cos(dot(position, M)) +
         P(Rot_Mat' * position, z) * cos(dot(position, Rot_Mat * M)) +

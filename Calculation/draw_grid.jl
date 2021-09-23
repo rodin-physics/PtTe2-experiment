@@ -1,6 +1,5 @@
 using CairoMakie
 using Distributed
-using Colors
 proc_number = 4;
 if nprocs() < proc_number
     addprocs(proc_number - nprocs())
@@ -9,10 +8,6 @@ end
 @everywhere include("/Users/harshitramahalingam/Documents/CA2DM/PtTe2-experiment/Calculation/calc_settings.jl")
 
 ## Testing parameters
-small_lattice = 7.604/3         # In Bohr radii
-small_d1 = [small_lattice / 2, small_lattice * √(3) / 2]
-small_d2 = [-small_lattice / 2, small_lattice * √(3) / 2]
-
 x_pos = 80
 xs = -x_pos:x_pos
 
@@ -38,6 +33,15 @@ y_positions2 = map(y -> y.loc.v2, POTENTIAL)
 X_LP = d1[1] .* x_positions2 + d2[1] .* y_positions2
 Y_LP = d1[2] .* x_positions2 + d2[2] .* y_positions2
 
+## Testing out potential positions on small grid
+# tester = make_shape2(U_val1, U_val2, 3, config3)
+tester = make_shape2(U_val1, U_val2, 10, config7)
+LP_xpos2 = map(y -> y.loc.v1, tester)
+LP_ypos2 = map(y -> y.loc.v2, tester)
+
+X_LP2 = small_d1[1] .* LP_xpos2 + small_d2[1] .* LP_ypos2
+Y_LP2 = small_d1[2] .* LP_xpos2 + small_d2[2] .* LP_ypos2
+
 
 ## Plotting
 
@@ -52,15 +56,15 @@ ax =
         xlabelsize = 20,
         ylabelsize = 20,
         title = "Grid Comparison",
-        titlefont = "LibreBaskerville-Regular.ttf",
+        titlefont = "Calculation/LibreBaskerville-Regular.ttf",
         titlesize = 30,
         xticklabelsize = 18,
         yticklabelsize = 18,
         aspect = DataAspect(),
-        xticklabelfont = "LibreBaskerville-Regular.ttf",
-        yticklabelfont = "LibreBaskerville-Regular.ttf",
-        xlabelfont = "LibreBaskerville-Italic.ttf",
-        ylabelfont = "LibreBaskerville-Italic.ttf",
+        xticklabelfont = "Calculation/LibreBaskerville-Regular.ttf",
+        yticklabelfont = "Calculation/LibreBaskerville-Regular.ttf",
+        xlabelfont = "Calculation/LibreBaskerville-Italic.ttf",
+        ylabelfont = "Calculation/LibreBaskerville-Italic.ttf",
     )
 
 sc = CairoMakie.scatter!(
@@ -71,7 +75,7 @@ sc = CairoMakie.scatter!(
     marker = :hexagon,
     strokecolor = :black,
     color = :transparent,
-    markersize = 92,
+    markersize = 181,
     )
 
 sc = CairoMakie.scatter!(
@@ -82,7 +86,7 @@ sc = CairoMakie.scatter!(
     marker = :hexagon,
     strokecolor = :grey,
     color = :transparent,
-    markersize = 30,
+    markersize = 60,
     )
 
 sc = CairoMakie.scatter!(
@@ -97,7 +101,19 @@ sc = CairoMakie.scatter!(
     markeralpha = 0.3
     )
 
+sc = CairoMakie.scatter!(
+    ax,
+    X_LP2 .* a0 / 10,
+    Y_LP2 .* a0 / 10,
+    marker = :hexagon,
+    markersize = 60,
+    # markersize = 10,
+    color = RGBA(0.0,0.4,0.8,0.6) ,
+    strokewidth = 0.0,
+    )
+
+
 tightlimits!(ax)
-xlims!(ax, (-5.0, 5.0))
-ylims!(ax, (-5.0, 5.0))
+xlims!(ax, (-2.5, 2.5))
+ylims!(ax, (-2.5, 2.5))
 fig

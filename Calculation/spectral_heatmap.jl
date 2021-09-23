@@ -13,11 +13,11 @@ end
 @everywhere include("/Users/harshitramahalingam/Documents/CA2DM/PtTe2-experiment/Calculation/calc_settings.jl")
 ## Calculation
 location_list = range(-10, 10, step = 1)
-full_map = @showprogress map(x -> map(y -> spectral_bulk(x, Location(0, y), s), location_list), ωs)
+full_map = @showprogress map(x -> map(y -> spectral_bulk(x, Location(1, y), s), location_list), ωs)
 full_grid = reshape([(full_map...)...], length(location_list), :)
 #
-distx = d1[1] .* location_list
-disty = d1[2] .* location_list
+distx = small_d1[1] .* location_list
+disty = small_d1[2] .* location_list
 
 ## Plotting
 
@@ -33,17 +33,17 @@ ax =
                 ylabelpadding = 8,
                 xlabelsize = 14,
                 ylabelsize = 14,
-                xticklabelsize = 9.5,
-                yticklabelsize = 9.5,
-                xticklabelfont = "Times New Roman.ttf",
-                yticklabelfont = "Times New Roman.ttf",
-                titlefont = "Times New Roman.ttf",
-                xlabelfont = "Times New Roman Italic.ttf",
-                ylabelfont = "Times New Roman Italic.ttf",
+                xticklabelsize = 30,
+                yticklabelsize = 30,
+                xticklabelfont = "Calculation/Times New Roman.ttf",
+                yticklabelfont = "Calculation/Times New Roman.ttf",
+                titlefont = "Calculation/Times New Roman.ttf",
+                xlabelfont = "Calculation/Times New Roman Italic.ttf",
+                ylabelfont = "Calculation/Times New Roman Italic.ttf",
                 title = "Full Heatmap",
-                titlesize = 10,
-                xticks = -2.0:0.05:2.0,
-                # aspect = AxisAspect(1.5),
+                titlesize = 60,
+                xticks = -2.0:0.5:2.0,
+                aspect = AxisAspect(1.5),
         )
 
 sc = CairoMakie.heatmap!(
@@ -59,14 +59,14 @@ sc = CairoMakie.heatmap!(
 
 
 cbar = Colorbar(fig[1,2],
-        width = 10,
+        width = 30,
         # limits = sc.colorrange,
         # limits = [minimum(signal), maximum(signal)],
         limits = [lower, upper],
         colormap = cgrad(:jet, rev = false),
-        ticklabelfont = "Times New Roman.ttf",
+        ticklabelfont = "Calculation/Times New Roman.ttf",
         ticklabelsize = 10,
-        labelfont = "Times New Roman.ttf",
+        labelfont = "Calculation/Times New Roman.ttf",
         labelsize = 10,
         # label = "A(ω) (electron/orbital) ",
         # ticks = 0.00:0.005:0.06,
@@ -75,7 +75,7 @@ cbar = Colorbar(fig[1,2],
 )
 
 tightlimits!(ax)
-CairoMakie.xlims!(ax, [-0.2, 1.5])
+xlims!(ax, (-0.3, 1.5))
 # CairoMakie.ylims!(ax, [0, 17])
 colgap!(fig.layout, 1, Fixed(0))
 
