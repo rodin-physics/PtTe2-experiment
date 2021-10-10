@@ -119,6 +119,6 @@ end
 
 
 ## Series of figures
-for ii in range(-0.3, 0.3, step = 0.01)
+for ii in range(-0.5, 0.3, step = 0.01)
     plotter_func(ii)
 end

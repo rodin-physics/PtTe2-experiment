@@ -11,8 +11,8 @@ const ħ = 1
 const ryd = 13.606              # Rydberg constant in eV
 const a0 = 0.529                # Bohr radius in angstroms
 
-const lattice_constant = 7.604  # In Bohr radii
-const lattice_constant2 = 7.604/3  # In Bohr radii
+const lattice_constant = 7.597  # In Bohr radii
+const lattice_constant2 = 7.597/3  # In Bohr radii
 
 const d1 = [lattice_constant / 2, lattice_constant * √(3) / 2]
 const d2 = [-lattice_constant / 2, lattice_constant * √(3) / 2]
@@ -35,7 +35,7 @@ const M = [0, π / lattice_constant]
 
 ## Integration
 const ν = 1e-4;         # Relative tolerance for integration
-const η = 1e-6;         # Small number for imaginary parts
+const η = 1e-2;         # Small number for imaginary parts
 
 const NumEvals = 1e5;   # Max number of integrals in quadgk
 

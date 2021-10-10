@@ -43,15 +43,15 @@ ax =
         xlabelsize = 50,
         ylabelsize = 50,
         # title = "FO map at $ω eV",
-        titlefont = "LibreBaskerville-Regular.ttf",
+        titlefont = "Calculation/LibreBaskerville-Regular.ttf",
         titlesize = 60,
         xticklabelsize = 18,
         yticklabelsize = 18,
         aspect = DataAspect(),
-        xticklabelfont = "LibreBaskerville-Regular.ttf",
-        yticklabelfont = "LibreBaskerville-Regular.ttf",
-        xlabelfont = "LibreBaskerville-Italic.ttf",
-        ylabelfont = "LibreBaskerville-Italic.ttf",
+        xticklabelfont = "Calculation/LibreBaskerville-Regular.ttf",
+        yticklabelfont = "Calculation/LibreBaskerville-Regular.ttf",
+        xlabelfont = "Calculation/LibreBaskerville-Italic.ttf",
+        ylabelfont = "Calculation/LibreBaskerville-Italic.ttf",
     )
 
 sc = CairoMakie.scatter!(
@@ -65,7 +65,7 @@ sc = CairoMakie.scatter!(
     # markersize = 45,
     markersize = 41,
     colormap = :jet,
-    colorrange = (0.1, 1.45)
+    colorrange = (0.15, 1.6)
     # colorrange = (color_lim, -color_lim),
 )
 
@@ -88,8 +88,8 @@ sc = CairoMakie.scatter!(
     Y_latt .* a0 / 10,
     strokewidth = 1.8,
     marker = :hexagon,
-    # strokecolor = RGBA(1.0,1.0,1.0,0.25),
-    strokecolor = RGBA(0.0,0.0,0.0,0.25),
+    strokecolor = RGBA(1.0,1.0,1.0,0.25),
+    # strokecolor = RGBA(0.0,0.0,0.0,0.25),
     color = :transparent,
     markersize = 120,
     strokestyle = :dot
