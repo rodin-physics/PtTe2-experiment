@@ -31,3 +31,8 @@ function spectral_bulk(ω, R::Location, s::AtomsSystem)
     correction_spectral = -δρ_calc(R, ω + 1im * η, potential) / π |> imag
     return (pristine_spectral + correction_spectral)
 end
+
+function spectral_bulk_average(ω, Rs::Vector{Location}, s::AtomsSystem)
+    res = map(x -> spectral_bulk(ω, x, s), Rs)
+    return mean(res)
+end

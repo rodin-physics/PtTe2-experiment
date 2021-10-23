@@ -1,6 +1,7 @@
 using CairoMakie
 using DelimitedFiles
 
+
 QX = readdlm("QX.dat")
 QY = readdlm("QY.dat")
 FT_real = readdlm("FT_real.dat")
@@ -36,27 +37,53 @@ fig2 = CairoMakie.Figure(resolution = (1800, 1800))
 ax2 =
         fig2[1, 1] = Axis(
                 fig2,
-                xlabel = "qx",
-                ylabel = "qy",
+                xlabel = "kx",
+                ylabel = "ky",
                 xlabelpadding = 0,
                 ylabelpadding = 0,
-                xlabelsize = 12,
-                ylabelsize = 12,
-                xticklabelsize = 12,
-                yticklabelsize = 12,
-                title = "FT - $ω eV",
-                titlefont = "LibreBaskerville-Regular.ttf",
-                titlesize = 12,
+                xlabelsize = 40,
+                ylabelsize = 40,
+                xticklabelsize = 40,
+                yticklabelsize = 40,
+                title = "FT at $ω eV",
+                titlefont = "Calculation/LibreBaskerville-Regular.ttf",
+                titlesize = 40,
                 aspect = AxisAspect(1),
-                xticklabelfont = "LibreBaskerville-Regular.ttf",
-                yticklabelfont = "LibreBaskerville-Regular.ttf",
-                xlabelfont = "LibreBaskerville-Italic.ttf",
-                ylabelfont = "LibreBaskerville-Italic.ttf",
+                xticklabelfont = "Calculation/LibreBaskerville-Regular.ttf",
+                yticklabelfont = "Calculation/LibreBaskerville-Regular.ttf",
+                xlabelfont = "Calculation/LibreBaskerville-Italic.ttf",
+                ylabelfont = "Calculation/LibreBaskerville-Italic.ttf",
         )
 
 hm2 = heatmap!(qx, qy, abs.(FT_res),
-                colormap = :oslo,
-                colorrange = (0,70))
-Colorbar(fig2[1, 2], hm2, width =40)
+                colormap = cgrad(:FT_scheme),
+                colorrange = (0,13))
+
+# scatter!([qx_max,-qx_max, qx_max,-qx_max],[qx_max,-qx_max, -qx_max,qx_max], markersize = 18)
+
+# scatter!([0.0], [0.0], marker = :hexagon, markersize = 556, color = :transparent, markerstyle = :dashdot, strokewidth = 2, strokecolor = :white)
+
+scatter!([0.0], [0.0], marker = :hexagon, markersize = 850, color = :transparent, markerstyle = :dashdot, strokewidth = 2, strokecolor = :white)
+
+scatter!(
+    ax2,
+    X_reci,
+    Y_reci,
+    strokewidth = 1.8,
+    marker = :circle,
+    # strokecolor = RGBA(1.0,1.0,1.0,0.25),
+    strokecolor = RGBA(0.0,0.0,0.0,0.25),
+    color = :white,
+    markersize = 40,
+    strokestyle = :dot
+    )
+
+vlines!(ax2, [qx_min, qx_max], color = :white, linewidth = 2)
+hlines!(ax2, [qx_min, qx_max], color = :white, linewidth = 2)
+# Color bar(fig2[1, 2], hm2, width =40)
+
+tightlimits!(ax2)
+xlims!(ax2, (4*qx_min, 4*qx_max))
+ylims!(ax2, (4*qx_min, 4*qx_max))
 fig2
 # save("FT_amplitude.pdf", fig2)

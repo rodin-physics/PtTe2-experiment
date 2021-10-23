@@ -69,7 +69,7 @@ function plotter_func(energy::Float64)
         marker = :hexagon,
         # markersize = 45,
         markersize = 60,
-        colormap = :jet,
+        colormap = cgrad(:custom_rainbow_scheme),
         # colorrange = (0.0, 0.007)
         # colorrange = (color_lim, -color_lim),
     )
@@ -119,6 +119,6 @@ end
 
 
 ## Series of figures
-for ii in range(-0.5, 0.3, step = 0.01)
+for ii in range(0.0, 0.8, step = 0.01)
     plotter_func(ii)
 end
