@@ -1,52 +1,116 @@
-include("calc_settings.jl")
-
-## Grid definitions
-xs = reduce(vcat, XS)
-ys = reduce(vcat, YS)
-
-X = small_d1[1] .* xs + small_d2[1] .* ys
-Y = small_d1[2] .* xs + small_d2[2] .* ys
+@everywhere include("calc_settings.jl")
 
 
+## Definitions and Calculation
+# Convert X and Y to Bohr radii. Reshape the arrays
+us = vec(US)
+vs = vec(VS)
+# x and y axis of the spectral map in Bohr radii
+X = refined_d1[1] .* us + refined_d2[1] .* vs
+Y = refined_d1[2] .* us + refined_d2[2] .* vs
 
-## Real-space computation
-res = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), XS, YS)
-signal = reduce(vcat, res)
+signal = @showprogress pmap((u, v) -> spectral_bulk(ω, Location(u, v), s), us, vs)
 
+fig = Figure(resolution=(1800, 1800))
+ax =
+    fig[1, 1] = Axis(
+        fig,
+        xlabel="x/nm",
+        ylabel="y/nm",
+        xlabelpadding=0,
+        ylabelpadding=0,
+        xlabelsize=50,
+        ylabelsize=50,
+        # title = "FO map at $ω eV",
+        titlefont="Calculation/LibreBaskerville-Regular.ttf",
+        titlesize=60,
+        xticklabelsize=18,
+        yticklabelsize=18,
+        
+        xticklabelfont="Calculation/LibreBaskerville-Regular.ttf",
+        yticklabelfont="Calculation/LibreBaskerville-Regular.ttf",
+        xlabelfont="Calculation/LibreBaskerville-Italic.ttf",
+        ylabelfont="Calculation/LibreBaskerville-Italic.ttf",
+    )
 
-XS = reshape(X, 1, (2*x_pos+1)^2)
-YS = reshape(Y, 1, (2*x_pos+1)^2)
-signal1 = reshape(signal, 1, (2*x_pos+1)^2)
-signal1 = signal1 .- signal1[1]
+sc = CairoMakie.scatter!(
+    ax,
+    X,
+    Y,
+    color=signal,
+    strokewidth=0,
+    marker=:hexagon,
+    markersize=8,
+    # markersize=40.6,
+    colormap=cgrad(:custom_rainbow_scheme),
+    colorrange = (0.3, 1.2)
+)
 
-## Fourier components
-function FT_component(qx, qy, ρ, XS, YS)
-    res = sum(map((x, y, z) -> exp(1im * (x * qx + y * qy)) * z, XS, YS, ρ))
-end
+lim = maximum(X)
+tightlimits!(ax)
+xlims!(ax, (-lim, lim))
+ylims!(ax, (-lim, lim))
+fig
 
-reciprocal_const = 2*π / lattice_constant
-
-r_d1 = [reciprocal_const, reciprocal_const * √(3) / 3]
-r_d2 = [-reciprocal_const, reciprocal_const * √(3) / 3]
-
-X_reci = r_d1[1] .* xs + r_d2[1] .* ys
-Y_reci = r_d1[2] .* xs + r_d2[2] .* ys
-
-qx_min = -2 * π / lattice_constant;
-qx_max = 2 * π / lattice_constant;
-
-n_pts = 800;
-
-qx = range(4*qx_min, 4*qx_max, length = n_pts)
-qy = range(4*qx_min, 4*qx_max, length = n_pts)
-
-QX = repeat(qx, 1, n_pts)
-QY = repeat(qy, 1, n_pts) |> permutedims
 
 ## Calculation
-FT_res = @showprogress map((qx, qy) -> FT_component(qx, qy, signal1, XS, YS), QX, QY)
+signal = signal .- signal[1]
+FT_res = @showprogress pmap((qx, qy) -> FT_component(qx, qy, signal, X, Y), QX, QY)
 
 writedlm("QX.dat", QX)
 writedlm("QY.dat", QY)
 writedlm("FT_real.dat", real.(FT_res))
 writedlm("FT_imag.dat", imag.(FT_res))
+
+r_d1 = 2 * π / lattice_constant .* [1, √(3) / 3]
+r_d2 = 2 * π / lattice_constant .* [-1, √(3) / 3]
+
+X_reci = r_d1[1] .* us + r_d2[1] .* vs
+Y_reci = r_d1[2] .* us + r_d2[2] .* vs
+
+fig2 = CairoMakie.Figure(resolution=(1800, 1800))
+ax2 =
+        fig2[1, 1] = Axis(
+                fig2,
+                xlabel="kx",
+                ylabel="ky",
+                xlabelpadding=0,
+                ylabelpadding=0,
+                xlabelsize=40,
+                ylabelsize=40,
+                xticklabelsize=40,
+                yticklabelsize=40,
+                title="FT at $ω eV",
+                titlefont="Calculation/LibreBaskerville-Regular.ttf",
+                titlesize=40,
+                aspect=AxisAspect(1),
+                xticklabelfont="Calculation/LibreBaskerville-Regular.ttf",
+                yticklabelfont="Calculation/LibreBaskerville-Regular.ttf",
+                xlabelfont="Calculation/LibreBaskerville-Italic.ttf",
+                ylabelfont="Calculation/LibreBaskerville-Italic.ttf",
+        )
+
+hm2 = heatmap!(QX[:,1], QY[1,:], abs.(FT_res),
+                colormap=cgrad(:FT_scheme),
+                # colorrange=(0, 13)
+                )
+
+scatter!(
+    ax2,
+    X_reci,
+    Y_reci,
+    strokewidth=1.8,
+    marker=:circle,
+    # strokecolor = RGBA(1.0,1.0,1.0,0.25),
+    strokecolor=RGBA(0.0, 0.0, 0.0, 0.25),
+    color=:white,
+    markersize=40,
+    strokestyle=:dot
+    )
+
+tightlimits!(ax2)
+xlims!(ax2, (qx_min, qx_max))
+ylims!(ax2, (qx_min, qx_max))
+fig2
+
+

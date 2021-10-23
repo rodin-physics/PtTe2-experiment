@@ -20,7 +20,7 @@ function δρR(R::Location, s::AtomsSystem)
     μ = s.μ
     potential = s.potential
     f_int(x) = (1 / 2 * π) * δρ_calc(R, μ + 1im * x, potential)
-    res = quadgk(f_int, 0, Inf, maxevals = NumEvals, rtol = ν)
+    res = quadgk(f_int, 0, Inf, maxevals=NumEvals, rtol=ν)
     return 2 * real(res[1][1])
 end
 

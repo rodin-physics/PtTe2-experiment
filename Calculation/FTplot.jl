@@ -6,8 +6,16 @@ QX = readdlm("QX.dat")
 QY = readdlm("QY.dat")
 FT_real = readdlm("FT_real.dat")
 FT_imag = readdlm("FT_imag.dat")
-
 FT_res = FT_real + 1im .* FT_imag
+
+
+r_d1 = 2 * π / lattice_constant .* [1, √(3) / 3]
+r_d2 = 2 * π / lattice_constant .* [-1, √(3) / 3]
+qx_max
+X_reci = r_d1[1] .* xs + r_d2[1] .* ys
+Y_reci = r_d1[2] .* xs + r_d2[2] .* ys
+
+
 
 # fig = CairoMakie.Figure(resolution = (1800, 1800))
 # ax =
@@ -55,7 +63,7 @@ ax2 =
                 ylabelfont = "Calculation/LibreBaskerville-Italic.ttf",
         )
 
-hm2 = heatmap!(qx, qy, abs.(FT_res),
+hm2 = heatmap!(QX[:,1], QY[1,:], abs.(FT_res),
                 colormap = cgrad(:FT_scheme),
                 colorrange = (0,13))
 
@@ -63,7 +71,7 @@ hm2 = heatmap!(qx, qy, abs.(FT_res),
 
 # scatter!([0.0], [0.0], marker = :hexagon, markersize = 556, color = :transparent, markerstyle = :dashdot, strokewidth = 2, strokecolor = :white)
 
-scatter!([0.0], [0.0], marker = :hexagon, markersize = 850, color = :transparent, markerstyle = :dashdot, strokewidth = 2, strokecolor = :white)
+# scatter!([0.0], [0.0], marker = :hexagon, markersize = 850, color = :transparent, markerstyle = :dashdot, strokewidth = 2, strokecolor = :white)
 
 scatter!(
     ax2,
@@ -78,12 +86,14 @@ scatter!(
     strokestyle = :dot
     )
 
-vlines!(ax2, [qx_min, qx_max], color = :white, linewidth = 2)
-hlines!(ax2, [qx_min, qx_max], color = :white, linewidth = 2)
-# Color bar(fig2[1, 2], hm2, width =40)
+# vlines!(ax2, [qx_min, qx_max], color = :white, linewidth = 2)
+# hlines!(ax2, [qx_min, qx_max], color = :white, linewidth = 2)
+# # Color bar(fig2[1, 2], hm2, width =40)
 
-tightlimits!(ax2)
-xlims!(ax2, (4*qx_min, 4*qx_max))
-ylims!(ax2, (4*qx_min, 4*qx_max))
+# tightlimits!(ax2)
+xlims!(ax2, (1*qx_min, 1*qx_max))
+ylims!(ax2, (1*qx_min, 1*qx_max))
 fig2
-# save("FT_amplitude.pdf", fig2)
+save("Test.pdf", fig2)
+
+
