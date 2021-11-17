@@ -7,31 +7,39 @@ using SpecialFunctions
 using Statistics
 
 ## Parameters
+const M_scatter = true      # True for M-point scattering, false for Γ and K- scattering
 const ħ = 1
-const ryd = 13.606              # Rydberg constant in eV
-const a0 = 0.529                # Bohr radius in angstroms
+const ryd = 13.606          # Rydberg constant in eV
+const a0 = 0.529            # Bohr radius in angstroms
 
-const lattice_constant = 7.597       # In Bohr radii
-const d1 = [lattice_constant / 2, lattice_constant * √(3) / 2]
-const d2 = [-lattice_constant / 2, lattice_constant * √(3) / 2]
+const lattice_constant = 7.597                  # In Bohr radii
+const d1 = lattice_constant .* [1/2, √(3)/2]    # Lattice vectors of PtTe2
+const d2 = lattice_constant .* [-1/2, √(3)/2]
 
-const scale_factor = 3
-
-const refined_d1 = d1 ./ scale_factor
+const scale_factor = 3                 # Scaling factor for refined lattice
+const refined_d1 = d1 ./ scale_factor   # Scaled lattice vectors
 const refined_d2 = d2 ./ scale_factor
 
-# Effective mass in the armchair(x) and zigzag(y) direction in m_e
-const mx = 0.1
-const my = 1.4
+const r_d1 = 2*π / lattice_constant .* [1, √(3)/3]  # Reciprocal lattice vectors
+const r_d2 = 2*π / lattice_constant .* [-1, √(3) / 3]
 
 # Area of the unit cell in Bohr radii squared
 const UC_area = d1[1] * d2[2] - d1[2] * d2[1];
 
-# Upper limit of propagator integral
-const C = 4 * π / UC_area / sqrt(mx * my) * ryd / 3;
+struct ScatterType
+    mx::Float64         # Effective mass in x direction (m_e)
+    my::Float64         # Effective mass in y direction (m_e)
+    C::Float64          # Upper limit of propagator integral (m_e)
+end
+
+M = ScatterType(0.1, 1.4, 4 * π / UC_area * ryd / 3)
+Γ = ScatterType(0.13, 0.12, 2 * π / UC_area * ryd)
+K = ScatterType(0.64, 0.52, 3 * π / UC_area * ryd)
+
 
 const Rot_Mat = [cos(π / 3) sin(π / 3); -sin(π / 3) cos(π / 3)]
-const M = [0, π / lattice_constant]
+const M_coord = [0, π / lattice_constant]
+const K_coord = [(2*π)/(√(3) * lattice_constant), 0]
 
 ## Integration
 const ν = 1e-4;         # Relative tolerance for integration
@@ -61,21 +69,27 @@ function Base.:*(l1::Location, l2::Location)
 end
 
 ## Propagator, r in Bohr radii
-function P(r, z::ComplexF64)
-    md = √(mx * r[1]^2 + my * r[2]^2)
+function P(r, z::ComplexF64, point::ScatterType)
+    md = √(point.mx * r[1]^2 + point.my * r[2]^2)
+    C_val = point.C / sqrt(point.mx * point.my)
     if md == 0.0
-        return (-1 / C) * (log(Complex(1 - (C / z))))
+        return (-1 / C_val) * (log(Complex(1 - (C_val / z))))
     else
-        return (-2 / C) * besselk(0, (md * √(-z / ryd)))
+        return (-2 / C_val) * besselk(0, (md * √(-z / ryd)))
     end
 end
 
 function Ξ(r::Location, z::ComplexF64)
     position = r.v1 * refined_d1 + r.v2 * refined_d2
-    res =
-        P(position, z) * cos(dot(position, M)) +
-        P(Rot_Mat' * position, z) * cos(dot(position, Rot_Mat * M)) +
-        P(Rot_Mat * position, z) * cos(dot(position, Rot_Mat' * M))
+
+    if M_scatter
+        res = P(position, z, M) * cos(dot(position, M_coord)) +
+        P(Rot_Mat' * position, z, M) * cos(dot(position, Rot_Mat * M_coord)) +
+        P(Rot_Mat * position, z, M) * cos(dot(position, Rot_Mat' * M_coord))
+    else
+        res = P(position, (z - 0.19), Γ) + (2/3 * P(position, z, K)) * (cos(dot(position, K_coord)) + cos(dot(position, Rot_Mat * K_coord)) + cos(dot(position, Rot_Mat' * K_coord)))
+    end
+
     return res
 end
 

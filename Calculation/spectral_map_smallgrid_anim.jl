@@ -5,37 +5,28 @@ if nprocs() < proc_number
     addprocs(proc_number - nprocs())
 end
 
-@everywhere include("/Users/harshitramahalingam/Documents/CA2DM/PtTe2-experiment/Calculation/calc_settings.jl")
+@everywhere include("Calculation/calc_settings.jl")
 
 ## Plotter function
 function plotter_func(energy::Float64)
-    xs = reduce(vcat, XS)
-    ys = reduce(vcat, YS)
+    us = vec(US)
+    vs = vec(VS)
+
     #x and y axis of the spectral map
-    X = small_d1[1] .* xs + small_d2[1] .* ys
-    Y = small_d1[2] .* xs + small_d2[2] .* ys
+    X = refined_d1[1] .* us + refined_d2[1] .* vs
+    Y = refined_d1[2] .* us + refined_d2[2] .* vs
 
-    X_latt = d1[1] .* xs + d2[1] .* ys
-    Y_latt = d1[2] .* xs + d2[2] .* ys
-    #Computation, Get the results
-    res = @showprogress pmap((x, y) -> spectral_bulk(energy, Location(x, y), s), XS, YS)
-    signal = reduce(vcat, res)
+    # Actual lattice
+    X_latt = d1[1] .* us + d2[1] .* vs
+    Y_latt = d1[2] .* us + d2[2] .* vs
 
-    x_positions2 = map(y -> y.loc.v1, POTENTIAL)
-    y_positions2 = map(y -> y.loc.v2, POTENTIAL)
+    u_LP = map(y -> y.loc.v1, POTENTIAL)
+    v_LP = map(y -> y.loc.v2, POTENTIAL)
 
-    X_LP = small_d1[1] .* x_positions2 + small_d2[1] .* y_positions2
-    Y_LP = small_d1[2] .* x_positions2 + small_d2[2] .* y_positions2
+    X_LP = refined_d1[1] .* u_LP + refined_d2[1] .* v_LP
+    Y_LP = refined_d1[2] .* u_LP + refined_d2[2] .* v_LP
 
-    # check_pos = all(>=(0), final_signal)
-    #
-    # if check_pos
-    #     println("Findmax")
-    #     color_lim = -findmax(final_signal)[1]
-    # else
-    #     println("Findmin")
-    #     color_lim = findmin(final_signal)[1]
-    # end
+    signal = @showprogress pmap((x, y) -> spectral_bulk(energy, Location(x, y), s), us, vs)
 
     fig = Figure(resolution = (1800, 1800))
     ax =
@@ -69,7 +60,7 @@ function plotter_func(energy::Float64)
         marker = :hexagon,
         # markersize = 45,
         markersize = 60,
-        colormap = cgrad(:custom_rainbow_scheme),
+        colormap = cgrad(:custom_rainbow),
         # colorrange = (0.0, 0.007)
         # colorrange = (color_lim, -color_lim),
     )
@@ -119,6 +110,6 @@ end
 
 
 ## Series of figures
-for ii in range(0.0, 0.8, step = 0.01)
+for ii in range(-0.8, -0.5, step = 0.02)
     plotter_func(ii)
 end

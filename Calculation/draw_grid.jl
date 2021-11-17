@@ -5,7 +5,7 @@ if nprocs() < proc_number
     addprocs(proc_number - nprocs())
 end
 
-@everywhere include("/Users/harshitramahalingam/Documents/CA2DM/PtTe2-experiment/Calculation/calc_settings.jl")
+@everywhere include("Calculation/calc_settings.jl")
 
 ## Testing parameters
 x_pos = 80
@@ -23,8 +23,8 @@ X = d1[1] .* xs + d2[1] .* ys
 Y = d1[2] .* xs + d2[2] .* ys
 
 # Coordinates of small lattice
-X2 = small_d1[1] .* xs + small_d2[1] .* ys
-Y2 = small_d1[2] .* xs + small_d2[2] .* ys
+X2 = refined_d1[1] .* xs + refined_d2[1] .* ys
+Y2 = refined_d1[2] .* xs + refined_d2[2] .* ys
 
 # Positions of local potentials for small lattice
 # x_positions2 = map(y -> y.loc.v1, POTENTIAL)
@@ -39,8 +39,8 @@ Y2 = small_d1[2] .* xs + small_d2[2] .* ys
 LP_xpos2 = map(y -> y.loc.v1, POTENTIAL)
 LP_ypos2 = map(y -> y.loc.v2, POTENTIAL)
 
-X_LP2 = small_d1[1] .* LP_xpos2 + small_d2[1] .* LP_ypos2
-Y_LP2 = small_d1[2] .* LP_xpos2 + small_d2[2] .* LP_ypos2
+X_LP2 = refined_d1[1] .* LP_xpos2 + refined_d2[1] .* LP_ypos2
+Y_LP2 = refined_d1[2] .* LP_xpos2 + refined_d2[2] .* LP_ypos2
 
 
 ## Plotting
@@ -76,7 +76,7 @@ sc = CairoMakie.scatter!(
     marker = :hexagon,
     strokecolor = :black,
     color = :transparent,
-    markersize = 116,
+    markersize = 460,
     )
 
 sc = CairoMakie.scatter!(
@@ -87,7 +87,7 @@ sc = CairoMakie.scatter!(
     marker = :hexagon,
     strokecolor = :grey,
     color = :transparent,
-    markersize = 38,
+    markersize = 50,
     )
 
 # sc = CairoMakie.scatter!(
@@ -107,7 +107,7 @@ sc = CairoMakie.scatter!(
     X_LP2 .* a0 / 10,
     Y_LP2 .* a0 / 10,
     marker = :hexagon,
-    markersize = 38,
+    markersize = 50,
     # markersize = 10,
     color = RGBA(0.0,0.4,0.8,0.6) ,
     strokewidth = 0.0,
@@ -115,6 +115,6 @@ sc = CairoMakie.scatter!(
 
 
 tightlimits!(ax)
-xlims!(ax, (-4.0, 4.0))
-ylims!(ax, (-4.0, 4.0))
+xlims!(ax, (-1.0, 1.0))
+ylims!(ax, (-1.0, 1.0))
 fig

@@ -5,18 +5,28 @@ if nprocs() < proc_number
     addprocs(proc_number - nprocs())
 end
 
-@everywhere include("calc_settings.jl")
+@everywhere include("Calculation/calc_settings.jl")
 
 ## Definitions and Calculation
 # Convert X and Y to Bohr radii. Reshape the arrays
-xs = vec(XS)
-ys = vec(YS)
+us = vec(US)
+vs = vec(VS)
 
 #x and y axis of the spectral map
-X = small_d1[1] .* xs + small_d2[1] .* ys
-Y = small_d1[2] .* xs + small_d2[2] .* ys
+X = refined_d1[1] .* us + refined_d2[1] .* vs
+Y = refined_d1[2] .* us + refined_d2[2] .* vs
 
-signal = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), xs, ys)
+# Actual lattice
+X_latt = d1[1] .* us + d2[1] .* vs
+Y_latt = d1[2] .* us + d2[2] .* vs
+
+u_LP = map(y -> y.loc.v1, POTENTIAL)
+v_LP = map(y -> y.loc.v2, POTENTIAL)
+
+X_LP = refined_d1[1] .* u_LP + refined_d2[1] .* v_LP
+Y_LP = refined_d1[2] .* u_LP + refined_d2[2] .* v_LP
+
+signal = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), us, vs)
 
 ## Plotting
 
@@ -24,7 +34,7 @@ fig = Figure(resolution = (1800, 1800))
 ax =
     fig[1, 1] = Axis(
         fig,
-        xlabel = "x/nm",
+        xlabel = "x/nm - $ω eV",
         ylabel = "y/nm",
         xlabelpadding = 0,
         ylabelpadding = 0,
@@ -35,7 +45,7 @@ ax =
         titlesize = 60,
         xticklabelsize = 18,
         yticklabelsize = 18,
-        
+
         xticklabelfont = "Calculation/LibreBaskerville-Regular.ttf",
         yticklabelfont = "Calculation/LibreBaskerville-Regular.ttf",
         xlabelfont = "Calculation/LibreBaskerville-Italic.ttf",
@@ -50,10 +60,10 @@ sc = CairoMakie.scatter!(
     strokewidth = 0,
     # marker = '◼',
     marker = :hexagon,
-    # markersize = 45,
+    # markersize = 40.6,
     markersize = 40.6,
-    colormap = cgrad(:custom_rainbow_scheme),
-    # colorrange = (0.3, 1.2)
+    colormap = cgrad(:custom_rainbow),
+    colorrange = (0.0, 7.8)
 )
 
 
@@ -84,6 +94,6 @@ sc = CairoMakie.scatter!(
 
 
 tightlimits!(ax)
-xlims!(ax, (-14.0, 14.0))
-ylims!(ax, (-14.0, 14.0))
+xlims!(ax, (-4.0, 4.0))
+ylims!(ax, (-4.0, 4.0))
 fig

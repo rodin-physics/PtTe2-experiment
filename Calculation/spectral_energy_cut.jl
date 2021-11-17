@@ -5,18 +5,22 @@ if nprocs() < proc_number
     addprocs(proc_number - nprocs())
 end
 
-include("/Users/harshitramahalingam/Documents/CA2DM/PtTe2-experiment/Calculation/Findpeaks.jl")
-@everywhere include("/Users/harshitramahalingam/Documents/CA2DM/PtTe2-experiment/Calculation/calc_settings.jl")
+include("Findpeaks.jl")
+@everywhere include("Calculation/calc_settings.jl")
 
 ## Calculation
+#
+# dI_dV1 = @showprogress pmap(x -> spectral_bulk(x, Location(1,1), s), ωs)
+#
+# dI_dV2 = @showprogress pmap(x -> spectral_bulk(x, Trimer.Center, s_trimer), ωs)
+#
+# dI_dV3 = @showprogress pmap(x -> spectral_bulk(x, Hexamer.Center, s_hexamer), ωs)
+#
+# dI_dV4 = @showprogress pmap(x -> spectral_bulk(x, Decamer.Center, s_decamer), ωs)
 
-# dI_dV1 = @showprogress pmap(x -> spectral_bulk_average(x, neighbors(Trimer.Corner), s), ωs)
-# dI_dV2 = @showprogress pmap(x -> spectral_bulk(x, Trimer.Edge, s), ωs)
-dI_dV3 = @showprogress pmap(x -> spectral_bulk(x, Inverted_Trimer.Center, s), ωs)
-
-peaks = findpeaks(dI_dV3, ωs, min_prom=0.0001)
-println(sort(ωs[peaks], rev = true))
-println(band_edge .- sort(ωs[peaks], rev = true))
+# peaks = findpeaks(dI_dV3, ωs, min_prom=0.0001)
+# println(sort(ωs[peaks], rev = true))
+# println(band_edge .- sort(ωs[peaks], rev = true))
 ## Plotting
 fig = Figure(resolution = (1800, 1800))
 ax =
@@ -38,16 +42,20 @@ ax =
         yticklabelfont = "Calculation/LibreBaskerville-Regular.ttf",
         xlabelfont = "Calculation/LibreBaskerville-Italic.ttf",
         ylabelfont = "Calculation/LibreBaskerville-Italic.ttf",
-        xticks = 2.0:0.2:3.0
+        xticks = -4.5:0.5:8.0
     )
 
-# lineplot = lines!(band_edge .- ωs, dI_dV1, color = :black, linewidth = 6, label = "Corner")
-# lineplot = lines!(band_edge .- ωs, dI_dV2, color = :red, linewidth = 6, label = "Edge")
-lineplot = lines!(band_edge .- ωs, dI_dV3, color = :blue, linewidth = 6, label = "Center")
+lineplot = lines!(2.3 .- ωs, dI_dV1, color = :red, linewidth = 6, label = "SV")
+lineplot = lines!(2.3 .- ωs, dI_dV2, color = :blue, linewidth = 6, label = "T")
+lineplot = lines!(2.3 .- ωs, dI_dV3, color = :gold, linewidth = 6, label = "H")
+lineplot = lines!(2.3 .- ωs, dI_dV4, color = :green, linewidth = 6, label = "D")
 
-CairoMakie.xlims!(ax, (2.0, 3.0))
-CairoMakie.ylims!(ax, (0.0, 4.0))
+CairoMakie.xlims!(ax, (2.5, 3.2))
+CairoMakie.ylims!(ax, (0.0, 0.1))
 
-vlines!(ax,[band_edge], color = :black, linewidth = 4, linestyle = :dash)
+vlines!(ax,[band_edge_vb], color = :black, linewidth = 4, linestyle = :dash)
+# vlines!(ax,[2.46], color = :blue, linewidth = 4, linestyle = :dash)
+# vlines!(ax,[2.32, 2.7], color = :gold, linewidth = 4, linestyle = :dash)
+# vlines!(ax,[2.375, 2.53], color = :green, linewidth = 4, linestyle = :dash)
 axislegend(labelsize = 45)
 fig

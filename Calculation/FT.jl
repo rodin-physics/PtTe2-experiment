@@ -1,5 +1,11 @@
-@everywhere include("calc_settings.jl")
+using CairoMakie
+using Distributed
+proc_number = 4;
+if nprocs() < proc_number
+    addprocs(proc_number - nprocs())
+end
 
+@everywhere include("Calculation/calc_settings.jl")
 
 ## Definitions and Calculation
 # Convert X and Y to Bohr radii. Reshape the arrays
@@ -8,70 +14,30 @@ vs = vec(VS)
 # x and y axis of the spectral map in Bohr radii
 X = refined_d1[1] .* us + refined_d2[1] .* vs
 Y = refined_d1[2] .* us + refined_d2[2] .* vs
+#
+# signal = @showprogress pmap((u, v) -> spectral_bulk(ω, Location(u, v), s), us, vs)
+#
+# ## Calculation
+# signal = signal .- signal[1]
+# FT_res = @showprogress pmap((qx, qy) -> FT_component(qx, qy, signal, X, Y), QX, QY)
 
-signal = @showprogress pmap((u, v) -> spectral_bulk(ω, Location(u, v), s), us, vs)
+upper = maximum(abs.(FT_res))
+# writedlm("QX.dat", QX)
+# writedlm("QY.dat", QY)
+# writedlm("FT_real.dat", real.(FT_res))
+# writedlm("FT_imag.dat", imag.(FT_res))
 
-fig = Figure(resolution=(1800, 1800))
-ax =
-    fig[1, 1] = Axis(
-        fig,
-        xlabel="x/nm",
-        ylabel="y/nm",
-        xlabelpadding=0,
-        ylabelpadding=0,
-        xlabelsize=50,
-        ylabelsize=50,
-        # title = "FO map at $ω eV",
-        titlefont="Calculation/LibreBaskerville-Regular.ttf",
-        titlesize=60,
-        xticklabelsize=18,
-        yticklabelsize=18,
-        
-        xticklabelfont="Calculation/LibreBaskerville-Regular.ttf",
-        yticklabelfont="Calculation/LibreBaskerville-Regular.ttf",
-        xlabelfont="Calculation/LibreBaskerville-Italic.ttf",
-        ylabelfont="Calculation/LibreBaskerville-Italic.ttf",
-    )
-
-sc = CairoMakie.scatter!(
-    ax,
-    X,
-    Y,
-    color=signal,
-    strokewidth=0,
-    marker=:hexagon,
-    markersize=8,
-    # markersize=40.6,
-    colormap=cgrad(:custom_rainbow_scheme),
-    colorrange = (0.3, 1.2)
-)
-
-lim = maximum(X)
-tightlimits!(ax)
-xlims!(ax, (-lim, lim))
-ylims!(ax, (-lim, lim))
-fig
-
-
-## Calculation
-signal = signal .- signal[1]
-FT_res = @showprogress pmap((qx, qy) -> FT_component(qx, qy, signal, X, Y), QX, QY)
-
-writedlm("QX.dat", QX)
-writedlm("QY.dat", QY)
-writedlm("FT_real.dat", real.(FT_res))
-writedlm("FT_imag.dat", imag.(FT_res))
-
-r_d1 = 2 * π / lattice_constant .* [1, √(3) / 3]
-r_d2 = 2 * π / lattice_constant .* [-1, √(3) / 3]
 
 X_reci = r_d1[1] .* us + r_d2[1] .* vs
 Y_reci = r_d1[2] .* us + r_d2[2] .* vs
 
-fig2 = CairoMakie.Figure(resolution=(1800, 1800))
-ax2 =
-        fig2[1, 1] = Axis(
-                fig2,
+X_reci2 = r_d1[1] .* (us./2) + r_d2[1] .* (vs./2)
+Y_reci2 = r_d1[2] .* (us./2) + r_d2[2] .* (vs./2)
+
+fig = CairoMakie.Figure(resolution=(1800, 1800))
+ax =
+        fig[1, 1] = Axis(
+                fig,
                 xlabel="kx",
                 ylabel="ky",
                 xlabelpadding=0,
@@ -92,11 +58,11 @@ ax2 =
 
 hm2 = heatmap!(QX[:,1], QY[1,:], abs.(FT_res),
                 colormap=cgrad(:FT_scheme),
-                # colorrange=(0, 13)
+                colorrange=(0,40)
                 )
 
 scatter!(
-    ax2,
+    ax,
     X_reci,
     Y_reci,
     strokewidth=1.8,
@@ -104,13 +70,23 @@ scatter!(
     # strokecolor = RGBA(1.0,1.0,1.0,0.25),
     strokecolor=RGBA(0.0, 0.0, 0.0, 0.25),
     color=:white,
-    markersize=40,
-    strokestyle=:dot
+    markersize=20,
+    strokestyle=:dot,
     )
 
-tightlimits!(ax2)
-xlims!(ax2, (qx_min, qx_max))
-ylims!(ax2, (qx_min, qx_max))
-fig2
+scatter!(
+        ax,
+        X_reci2,
+        Y_reci2,
+        strokewidth=1.8,
+        marker=:x,
+        strokecolor = RGBA(1.0,1.0,1.0,0.25),
+        # strokecolor=RGBA(0.0, 0.0, 0.0, 0.25),
+        color=:white,
+        markersize=25,
+        )
 
-
+tightlimits!(ax)
+xlims!(ax, (qx_min, qx_max))
+ylims!(ax, (qx_min, qx_max))
+fig

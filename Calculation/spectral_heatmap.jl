@@ -5,19 +5,14 @@ if nprocs() < proc_number
     addprocs(proc_number - nprocs())
 end
 
-@everywhere begin
-    using ProgressMeter
-    using Distributed
-end
-
-@everywhere include("/Users/harshitramahalingam/Documents/CA2DM/PtTe2-experiment/Calculation/calc_settings.jl")
+@everywhere include("Calculation/calc_settings.jl")
 ## Calculation
 location_list = range(-10, 10, step = 1)
 full_map = @showprogress map(x -> map(y -> spectral_bulk(x, Location(1, y), s), location_list), ωs)
 full_grid = reshape([(full_map...)...], length(location_list), :)
 #
-distx = small_d1[1] .* location_list
-disty = small_d1[2] .* location_list
+distx = refined_d1[1] .* location_list
+disty = refined_d1[2] .* location_list
 
 ## Plotting
 
