@@ -8,40 +8,22 @@ end
 @everywhere include("Calculation/calc_settings.jl")
 
 ## Testing parameters
-x_pos = 80
-xs = -x_pos:x_pos
+us = vec(US)
+vs = vec(VS)
 
-# Coordinates of the UC's
-XS = repeat(xs, 1, length(xs))
-YS = permutedims(XS)
+#x and y axis of the spectral map
+X = refined_d1[1] .* us + refined_d2[1] .* vs
+Y = refined_d1[2] .* us + refined_d2[2] .* vs
 
-# Convert X and Y to Bohr radii. Reshape the arrays
-xs = reduce(vcat, XS)
-ys = reduce(vcat, YS)
-# x and y axis of the spectral map
-X = d1[1] .* xs + d2[1] .* ys
-Y = d1[2] .* xs + d2[2] .* ys
+# Actual lattice
+X_latt = d1[1] .* us + d2[1] .* vs
+Y_latt = d1[2] .* us + d2[2] .* vs
 
-# Coordinates of small lattice
-X2 = refined_d1[1] .* xs + refined_d2[1] .* ys
-Y2 = refined_d1[2] .* xs + refined_d2[2] .* ys
+u_LP = map(y -> y.loc.v1, POTENTIAL)
+v_LP = map(y -> y.loc.v2, POTENTIAL)
 
-# Positions of local potentials for small lattice
-# x_positions2 = map(y -> y.loc.v1, POTENTIAL)
-# y_positions2 = map(y -> y.loc.v2, POTENTIAL)
-#
-# X_LP = d1[1] .* x_positions2 + d2[1] .* y_positions2
-# Y_LP = d1[2] .* x_positions2 + d2[2] .* y_positions2
-
-## Testing out potential positions on small grid
-# tester = make_shape2(U_val1, U_val2, 3, config3)
-# tester = make_shape2(U_val1, U_val2, 10, config7)
-LP_xpos2 = map(y -> y.loc.v1, POTENTIAL)
-LP_ypos2 = map(y -> y.loc.v2, POTENTIAL)
-
-X_LP2 = refined_d1[1] .* LP_xpos2 + refined_d2[1] .* LP_ypos2
-Y_LP2 = refined_d1[2] .* LP_xpos2 + refined_d2[2] .* LP_ypos2
-
+X_LP = refined_d1[1] .* u_LP + refined_d2[1] .* v_LP
+Y_LP = refined_d1[2] .* u_LP + refined_d2[2] .* v_LP
 
 ## Plotting
 
@@ -70,44 +52,32 @@ ax =
 
 sc = CairoMakie.scatter!(
     ax,
-    X .* a0 / 10,
-    Y .* a0 / 10,
+    X_latt .* a0 / 10,
+    Y_latt .* a0 / 10,
     strokewidth = 3.5,
     marker = :hexagon,
     strokecolor = :black,
     color = :transparent,
-    markersize = 460,
+    markersize = 230,
     )
 
 sc = CairoMakie.scatter!(
     ax,
-    X2 .* a0 / 10,
-    Y2 .* a0 / 10,
+    X .* a0 / 10,
+    Y .* a0 / 10,
     strokewidth = 2.3,
     marker = :hexagon,
     strokecolor = :grey,
     color = :transparent,
-    markersize = 50,
+    markersize = 76,
     )
-
-# sc = CairoMakie.scatter!(
-#     ax,
-#     X_LP .* a0 / 10,
-#     Y_LP .* a0 / 10,
-#     marker = :hexagon,
-#     markersize = 90,
-#     # markersize = 10,
-#     color = RGBA(0.0,0.0,0.0,0.3) ,
-#     strokewidth = 0.0,
-#     markeralpha = 0.3
-#     )
 
 sc = CairoMakie.scatter!(
     ax,
-    X_LP2 .* a0 / 10,
-    Y_LP2 .* a0 / 10,
+    X_LP .* a0 / 10,
+    Y_LP .* a0 / 10,
     marker = :hexagon,
-    markersize = 50,
+    markersize = 76,
     # markersize = 10,
     color = RGBA(0.0,0.4,0.8,0.6) ,
     strokewidth = 0.0,
@@ -115,6 +85,6 @@ sc = CairoMakie.scatter!(
 
 
 tightlimits!(ax)
-xlims!(ax, (-1.0, 1.0))
-ylims!(ax, (-1.0, 1.0))
+xlims!(ax, (-2.0, 2.0))
+ylims!(ax, (-2.0, 2.0))
 fig

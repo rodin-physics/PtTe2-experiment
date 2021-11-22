@@ -20,13 +20,14 @@ Y = refined_d1[2] .* us + refined_d2[2] .* vs
 X_latt = d1[1] .* us + d2[1] .* vs
 Y_latt = d1[2] .* us + d2[2] .* vs
 
-u_LP = map(y -> y.loc.v1, POTENTIAL)
-v_LP = map(y -> y.loc.v2, POTENTIAL)
+newPOT = filter(x -> x.V == U_val1, POTENTIAL)
+u_LP = map(y -> y.loc.v1, newPOT)
+v_LP = map(y -> y.loc.v2, newPOT)
 
 X_LP = refined_d1[1] .* u_LP + refined_d2[1] .* v_LP
 Y_LP = refined_d1[2] .* u_LP + refined_d2[2] .* v_LP
 
-signal = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), us, vs)
+# signal = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), us, vs)
 
 ## Plotting
 
@@ -63,21 +64,22 @@ sc = CairoMakie.scatter!(
     # markersize = 40.6,
     markersize = 40.6,
     colormap = cgrad(:custom_rainbow),
-    colorrange = (0.0, 7.8)
+    colorrange = (0.4, 0.44)
 )
 
 
 
-# sc = CairoMakie.scatter!(
-#     ax,
-#     X_LP .* a0 / 10,
-#     Y_LP .* a0 / 10,
-#     marker = :x,
-#     markersize = 20,
-#     # markersize = 10,
-#     color = :black ,
-#     strokewidth = 0.3,
-# )
+sc = CairoMakie.scatter!(
+    ax,
+    X_LP .* a0 / 10,
+    Y_LP .* a0 / 10,
+    marker = :circle,
+    markersize = 38,
+    # markersize = 10,
+    color = :transparent ,
+    strokewidth = 5,
+    strokecolor = :white
+)
 
 # sc = CairoMakie.scatter!(
 #     ax,

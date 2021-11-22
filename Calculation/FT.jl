@@ -15,11 +15,11 @@ vs = vec(VS)
 X = refined_d1[1] .* us + refined_d2[1] .* vs
 Y = refined_d1[2] .* us + refined_d2[2] .* vs
 #
-# signal = @showprogress pmap((u, v) -> spectral_bulk(ω, Location(u, v), s), us, vs)
+signal = @showprogress pmap((u, v) -> spectral_bulk(ω, Location(u, v), s), us, vs)
 #
 # ## Calculation
-# signal = signal .- signal[1]
-# FT_res = @showprogress pmap((qx, qy) -> FT_component(qx, qy, signal, X, Y), QX, QY)
+signal = signal .- signal[1]
+FT_res = @showprogress pmap((qx, qy) -> FT_component(qx, qy, signal, X, Y), QX, QY)
 
 upper = maximum(abs.(FT_res))
 # writedlm("QX.dat", QX)
@@ -58,7 +58,7 @@ ax =
 
 hm2 = heatmap!(QX[:,1], QY[1,:], abs.(FT_res),
                 colormap=cgrad(:FT_scheme),
-                colorrange=(0,40)
+                # colorrange=(0,40)
                 )
 
 scatter!(

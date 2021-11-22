@@ -5,9 +5,10 @@ using ProgressMeter
 using QuadGK
 using SpecialFunctions
 using Statistics
+using Colors, ColorSchemes
 
 ## Parameters
-const M_scatter = true      # True for M-point scattering, false for Γ and K- scattering
+M_scatter = true      # True for M-point scattering, false for Γ and K- scattering
 const ħ = 1
 const ryd = 13.606          # Rydberg constant in eV
 const a0 = 0.529            # Bohr radius in angstroms
@@ -36,14 +37,13 @@ M = ScatterType(0.1, 1.4, 4 * π / UC_area * ryd / 3)
 Γ = ScatterType(0.13, 0.12, 2 * π / UC_area * ryd)
 K = ScatterType(0.64, 0.52, 3 * π / UC_area * ryd)
 
-
 const Rot_Mat = [cos(π / 3) sin(π / 3); -sin(π / 3) cos(π / 3)]
 const M_coord = [0, π / lattice_constant]
 const K_coord = [(2*π)/(√(3) * lattice_constant), 0]
 
 ## Integration
 const ν = 1e-4;         # Relative tolerance for integration
-const η = 1e-2;         # Small number for imaginary parts
+const η = 0.05;         # Small number for imaginary parts
 
 const NumEvals = 1e5;   # Max number of integrals in quadgk
 

@@ -20,6 +20,19 @@ function neighbors(loc::Location)
     return [loc] .+ vec
 end
 
+# Function to get N-nearest neighbors by iteratively applying neighbors function
+function multiple_neighbors(loc::Location, idx::Int64)
+	current = [loc]
+	res = [loc]
+
+	for ii in 1:idx
+		current = filter(x -> x ∉ res, mapreduce(neighbors, vcat, current)) |> unique
+        res = vcat(res, current)
+	end
+	return res
+end
+
+
 # Function to place potentials in correct locations for finer grid
 function make_shape(U1::Float64, U2::Float64, shape::Int64, pt::Bool = true)
 	if shape ∉ [1,3,6,10]
@@ -33,28 +46,10 @@ function make_shape(U1::Float64, U2::Float64, shape::Int64, pt::Bool = true)
 
     vec = vec .+ [Location(shift, shift)]
 
-    pot1 = vcat(map(y -> map(x -> LocalPotential(U1, x), config1 .+ [y]), vec[1:shape])...)
-    pot2 = vcat(map(y -> map(x -> LocalPotential(U2, x), config2 .+ [y]), vec[1:shape])...)
+	pot1 = mapreduce(y -> map(x -> LocalPotential(U1, x), config1 .+ [y]), vcat, vec[1:shape])
+	pot2 = mapreduce(y -> map(x -> LocalPotential(U2, x), config2 .+ [y]), vcat, vec[1:shape])
 
     return vcat(pot1, pot2)
-end
-
-# Function to place potentials in correct locations for finer grid
-function make_shape2(U1::Float64, shape::Int64, pt::Bool = true)
-	if shape ∉ [1,3,6,10]
-		error("Invalid shape parameter")
-	end
-	inv = 2 * pt - 1
-
-    vec = [Location(0,0), Location(2,0), Location(0,2), Location(4,0), Location(0,4), Location(2,2), Location(6,0), Location(0,6), Location(4,2), Location(2,4)] .* [(Location(inv,inv) * Location(3,3))]
-
-    shift = (shape ÷ -5) * (inv * 3)
-
-    vec = vec .+ [Location(shift, shift)]
-
-    pot1 = vcat(map(y -> map(x -> LocalPotential(U1, x), config2 .+ [y]), vec[1:shape])...)
-
-    return pot1
 end
 
 
@@ -68,8 +63,6 @@ Inverted_Trimer = KeyLocations(Location(-1,-1), Location(1,1), Location(1,-2))
 function FT_component(qx, qy, ρ, XS, YS)
     res = sum(map((x, y, z) -> exp(1im * (x * qx + y * qy)) * z, XS, YS, ρ))
 end
-
-
 
 
 
