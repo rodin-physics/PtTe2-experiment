@@ -18,11 +18,11 @@ US = repeat(grid, 1, length(grid))
 VS = permutedims(US)
 
 # slice energy
-ω = 0.3
+ω = 0.05
 
 # Energies used in the spectral function
-ω_min = -0.8
-ω_max = 0.2
+ω_min = -1.2
+ω_max = 0.3
 ωs = range(ω_min, ω_max, length=nPts)
 
 # LocalPotential parameters
@@ -35,7 +35,7 @@ U_val2 = 0.155 * (1 - 2 * M_scatter)
 # Cluster_size: use 1 - SV, 3 - trimer, 6 - hexamer, 10 - decamer
 # Inverted: Optional arg, true for Pt-centred (default), false for Te-centred
 
-POTENTIAL = make_shape(U_val1, U_val2, 1)
+POTENTIAL = make_shape(U_val1, U_val2, 3)
 s = AtomsSystem(μ, T, POTENTIAL)
 s_trimer = AtomsSystem(μ, T, make_shape(U_val1, U_val2, 3))
 s_hexamer = AtomsSystem(μ, T, make_shape(U_val1, U_val2, 6))

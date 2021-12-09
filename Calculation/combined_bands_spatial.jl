@@ -1,11 +1,11 @@
 using CairoMakie
-using Distributed
-proc_number = 4;
-if nprocs() < proc_number
-    addprocs(proc_number - nprocs())
-end
+using DelimitedFiles
+include("calc_settings.jl")
 
-@everywhere include("Calculation/calc_settings.jl")
+vb_signal = readdlm("VB_signal.dat")
+cb_signal = readdlm("CB_signal.dat")
+signal_total = (1.0 .* cb_signal) .+ (0.3 .* vb_signal)
+
 
 ## Definitions and Calculation
 # Convert X and Y to Bohr radii. Reshape the arrays
@@ -27,10 +27,7 @@ v_LP = map(y -> y.loc.v2, newPOT)
 X_LP = refined_d1[1] .* u_LP + refined_d2[1] .* v_LP
 Y_LP = refined_d1[2] .* u_LP + refined_d2[2] .* v_LP
 
-signal = @showprogress pmap((x, y) -> spectral_bulk(ω, Location(x, y), s), us, vs)
-
 ## Plotting
-
 fig = Figure(resolution = (1800, 1800))
 ax =
     fig[1, 1] = Axis(
@@ -57,14 +54,14 @@ sc = CairoMakie.scatter!(
     ax,
     X .* a0 / 10,
     Y .* a0 / 10,
-    color = signal,
+    color = signal_total,
     strokewidth = 0,
     # marker = '◼',
     marker = :hexagon,
     # markersize = 40.6,
     markersize = 40.6,
     colormap = cgrad(:custom_rainbow),
-    # colorrange = (0.25, 0.6)
+    colorrange = (0.4, 0.6)
 )
 
 
@@ -76,7 +73,7 @@ sc = CairoMakie.scatter!(
     markersize = 38,
     # markersize = 10,
     color = :transparent ,
-    strokewidth = 5,
+    strokewidth = 5.6,
     strokecolor = :white
 )
 

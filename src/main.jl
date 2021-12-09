@@ -8,7 +8,7 @@ using Statistics
 using Colors, ColorSchemes
 
 ## Parameters
-M_scatter = true      # True for M-point scattering, false for Γ and K- scattering
+M_scatter = false      # True for M-point scattering, false for Γ and K- scattering
 const ħ = 1
 const ryd = 13.606          # Rydberg constant in eV
 const a0 = 0.529            # Bohr radius in angstroms
