@@ -52,12 +52,33 @@ function make_shape(U1::Float64, U2::Float64, shape::Int64, pt::Bool = true)
     return vcat(pot1, pot2)
 end
 
+# Function to make passivated hexamer
+function passivated_hexamer(U1::Float64, U2::Float64, U3::Float64, U4::Float64, cor::Int64)
+	if cor ∉ [1,2,3]
+		error("Invalid number of corners")
+	end
+
+	all_corners = [Location(0,0), Location(4,0), Location(0,4)] .* [Location(3,3)] .+ [Location(-3,-3)]
+	all_vec = [Location(0,0), Location(2,0), Location(0,2), Location(4,0), Location(0,4), Location(2,2)] .* [Location(3,3)] .+ [Location(-3,-3)]
+
+	corners = all_corners[1:cor]
+	vec = filter(x -> x ∉ corners, all_vec)
+
+	pot1 = mapreduce(y -> map(x -> LocalPotential(U1, x), config1 .+ [y]), vcat, vec)
+	pot2 = mapreduce(y -> map(x -> LocalPotential(U2, x), config2 .+ [y]), vcat, vec)
+
+	pot3 = mapreduce(y -> map(x -> LocalPotential(U3, x), config1 .+ [y]), vcat, corners)
+	pot4 = mapreduce(y -> map(x -> LocalPotential(U4, x), config2 .+ [y]), vcat, corners)
+
+	return vcat(pot1, pot2, pot3, pot4)
+end
+
 
 # List of KeyLocations for all vacancy clusters
 Trimer = KeyLocations(Location(1,1), Location(4,1), Location(3,3))
 Hexamer = KeyLocations(Location(-2,-2), Location(4,-2), Location(2,2))
 Decamer = KeyLocations(Location(-5, -5), Location(4,-5), Location(1,1))
-Inverted_Trimer = KeyLocations(Location(-1,-1), Location(1,1), Location(1,-2))
+Inverted_Trimer = KeyLocations(Location(1,1), Location(1,-2), Location(-1,-1))
 
 # Fourier analysis
 function FT_component(qx, qy, ρ, XS, YS)

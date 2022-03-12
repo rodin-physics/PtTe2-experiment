@@ -3,22 +3,21 @@ using DelimitedFiles
 include("calc_settings.jl")
 
 scaling_cb = 1.0
-scaling_vb = 0.3
+scaling_vb = 1.0
 
-xs_vb = reshape(readdlm("xs_vb.dat"), nPts)
-xs_cb = reshape(readdlm("xs_cb.dat"), nPts)
+xs = reshape(readdlm("xs.dat"), nPts)
 
 trimer_vb = reshape(readdlm("Trimer_VB.dat"), nPts)
 trimer_cb = reshape(readdlm("Trimer_CB.dat"), nPts)
-trimer_total = (scaling_cb .* trimer_cb) .+ (scaling_vb .* reverse(trimer_vb))
+# trimer_total = (scaling_cb .* trimer_cb) .+ (scaling_vb .* reverse(trimer_vb))
 
 hexamer_vb = reshape(readdlm("Hexamer_VB.dat"), nPts)
 hexamer_cb = reshape(readdlm("Hexamer_CB.dat"), nPts)
-hexamer_total = (scaling_cb .* hexamer_cb) .+ (scaling_vb .* reverse(hexamer_vb))
+# hexamer_total = (scaling_cb .* hexamer_cb) .+ (scaling_vb .* reverse(hexamer_vb))
 
 decamer_vb = reshape(readdlm("Decamer_VB.dat"), nPts)
 decamer_cb = reshape(readdlm("Decamer_CB.dat"), nPts)
-decamer_total = (scaling_cb .* decamer_cb) .+ (scaling_vb .* reverse(decamer_vb))
+# decamer_total = (scaling_cb .* decamer_cb) .+ (scaling_vb .* reverse(decamer_vb))
 
 
 fig = Figure(resolution = (1800, 1800))
@@ -26,14 +25,14 @@ ax =
     fig[1, 1] = Axis(
         fig,
         xlabel = "Energy/eV",
-        ylabel = "Spec Func",
+        # ylabel = "Spec Func",
         xlabelpadding = 0,
         ylabelpadding = 0,
         xlabelsize = 40,
         ylabelsize = 40,
         title = "Total Signal",
         titlefont = "Calculation/LibreBaskerville-Regular.ttf",
-        titlesize = 60,
+        titlesize = 50,
         xticklabelsize = 40,
         yticklabelsize = 40,
         aspect = AxisAspect(1),
@@ -46,22 +45,22 @@ ax =
 #
 band!(ax, band_edge_vb:0.05:band_edge_cb, -0.1, 2.5, color = :lightgrey)
 
-lineplot1 = lines!(xs_vb, trimer_vb, color = RGBA(0, 0, 1, 0.4), linewidth = 6, label = "Trimer", linestyle = :dashdot)
-lineplot = lines!(xs_cb, trimer_cb, color = RGBA(0, 0, 1, 0.4), linewidth = 6, linestyle = :dot)
-
-lineplot = lines!(xs_cb, trimer_total, color = :blue, linewidth = 6, linestyle = :solid)
+lineplot1 = lines!(xs, trimer_vb, color = RGBA(0, 0, 1, 1), linewidth = 6, label = "Trimer", linestyle = :dashdot)
+lineplot = lines!(xs, trimer_cb, color = RGBA(0, 0, 1, 1), linewidth = 6, linestyle = :dot)
+#
+# lineplot = lines!(xs_cb, trimer_total, color = :blue, linewidth = 6, linestyle = :solid)
 
 #
-lineplot2 = lines!(xs_vb, hexamer_vb, color = RGBA(1, 0.84, 0, 0.4), linewidth = 6, label = "Hexamer", linestyle = :dashdot)
-lineplot = lines!(xs_cb, hexamer_cb, color =  RGBA(1, 0.84, 0, 0.4), linewidth = 6, linestyle = :dot)
+lineplot2 = lines!(xs, hexamer_vb, color = RGBA(1, 0.84, 0, 1), linewidth = 6, label = "Hexamer", linestyle = :dashdot)
+lineplot = lines!(xs, hexamer_cb, color =  RGBA(1, 0.84, 0, 1), linewidth = 6, linestyle = :dot)
 
-lineplot = lines!(xs_cb, hexamer_total, color = :gold, linewidth = 6, linestyle = :solid)
+# lineplot = lines!(xs_cb, hexamer_total, color = :gold, linewidth = 6, linestyle = :solid)
 #
-lineplot3 = lines!(xs_vb, decamer_vb, color = RGBA(0, 0.5, 0, 0.4), linewidth = 6, label = "Decamer", linestyle = :dashdot)
-lineplot = lines!(xs_cb, decamer_cb, color = RGBA(0, 0.5, 0, 0.4), linewidth = 6, linestyle = :dot)
+lineplot3 = lines!(xs, decamer_vb, color = RGBA(0, 0.5, 0, 1), linewidth = 6, label = "Decamer", linestyle = :dashdot)
+lineplot = lines!(xs, decamer_cb, color = RGBA(0, 0.5, 0, 1), linewidth = 6, linestyle = :dot)
 
-lineplot = lines!(xs_cb, decamer_total, color = :green, linewidth = 6, linestyle = :solid)
-#
+# lineplot = lines!(xs_cb, decamer_total, color = :green, linewidth = 6, linestyle = :solid)
+# #
 CairoMakie.xlims!(ax, (2.0, 3.5))
 CairoMakie.ylims!(ax, (-0.1, 2.5))
 

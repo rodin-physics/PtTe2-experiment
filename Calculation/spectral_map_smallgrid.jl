@@ -5,7 +5,7 @@ if nprocs() < proc_number
     addprocs(proc_number - nprocs())
 end
 
-@everywhere include("Calculation/calc_settings.jl")
+@everywhere include("calc_settings.jl")
 
 ## Definitions and Calculation
 # Convert X and Y to Bohr radii. Reshape the arrays
@@ -20,7 +20,7 @@ Y = refined_d1[2] .* us + refined_d2[2] .* vs
 X_latt = d1[1] .* us + d2[1] .* vs
 Y_latt = d1[2] .* us + d2[2] .* vs
 
-newPOT = filter(x -> x.V == U_val1, POTENTIAL)
+newPOT = filter(x -> x.V == U_val1 || x.V == U_val3, POTENTIAL)
 u_LP = map(y -> y.loc.v1, newPOT)
 v_LP = map(y -> y.loc.v2, newPOT)
 
@@ -64,7 +64,7 @@ sc = CairoMakie.scatter!(
     # markersize = 40.6,
     markersize = 40.6,
     colormap = cgrad(:custom_rainbow),
-    # colorrange = (0.25, 0.6)
+    # colorrange = (0.1, 1.3)
 )
 
 
@@ -76,7 +76,7 @@ sc = CairoMakie.scatter!(
     markersize = 38,
     # markersize = 10,
     color = :transparent ,
-    strokewidth = 5,
+    strokewidth = 6,
     strokecolor = :white
 )
 

@@ -2,17 +2,14 @@ using CairoMakie
 using DelimitedFiles
 include("calc_settings.jl")
 
-vb_signal = readdlm("VB_signal.dat")
-cb_signal = readdlm("CB_signal.dat")
-signal_total = (1.0 .* cb_signal) .+ (0.3 .* vb_signal)
+signal_vb = reshape(readdlm("signal_vb.dat"), length(US))
+signal_cb = reshape(readdlm("signal_cb.dat"), length(US))
+signal_total = (1.0 .* signal_vb) .+ (0.5 .* signal_cb)
 
-
-## Definitions and Calculation
-# Convert X and Y to Bohr radii. Reshape the arrays
+## Definitions
 us = vec(US)
 vs = vec(VS)
 
-#x and y axis of the spectral map
 X = refined_d1[1] .* us + refined_d2[1] .* vs
 Y = refined_d1[2] .* us + refined_d2[2] .* vs
 
@@ -20,12 +17,14 @@ Y = refined_d1[2] .* us + refined_d2[2] .* vs
 X_latt = d1[1] .* us + d2[1] .* vs
 Y_latt = d1[2] .* us + d2[2] .* vs
 
-newPOT = filter(x -> x.V == U_val1, POTENTIAL)
+newPOT = filter(x -> x.V == U_val1 || x.V == U_val3, POTENTIAL)
 u_LP = map(y -> y.loc.v1, newPOT)
 v_LP = map(y -> y.loc.v2, newPOT)
 
 X_LP = refined_d1[1] .* u_LP + refined_d2[1] .* v_LP
 Y_LP = refined_d1[2] .* u_LP + refined_d2[2] .* v_LP
+
+
 
 ## Plotting
 fig = Figure(resolution = (1800, 1800))
@@ -61,7 +60,7 @@ sc = CairoMakie.scatter!(
     # markersize = 40.6,
     markersize = 40.6,
     colormap = cgrad(:custom_rainbow),
-    colorrange = (0.4, 0.6)
+    colorrange = (0.28, 0.315)
 )
 
 
@@ -73,7 +72,7 @@ sc = CairoMakie.scatter!(
     markersize = 38,
     # markersize = 10,
     color = :transparent ,
-    strokewidth = 5.6,
+    strokewidth = 6,
     strokecolor = :white
 )
 
