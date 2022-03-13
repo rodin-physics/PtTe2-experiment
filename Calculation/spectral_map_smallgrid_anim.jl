@@ -1,6 +1,6 @@
 using CairoMakie
 using Distributed
-proc_number = 4;
+proc_number = 24;
 if nprocs() < proc_number
     addprocs(proc_number - nprocs())
 end
@@ -20,13 +20,14 @@ function plotter_func(energy::Float64)
     X_latt = d1[1] .* us + d2[1] .* vs
     Y_latt = d1[2] .* us + d2[2] .* vs
 
-    u_LP = map(y -> y.loc.v1, POTENTIAL)
-    v_LP = map(y -> y.loc.v2, POTENTIAL)
+    newPOT = filter(x -> x.V == U_val1, POTENTIAL)
+    u_LP = map(y -> y.loc.v1, newPOT)
+    v_LP = map(y -> y.loc.v2, newPOT)
 
     X_LP = refined_d1[1] .* u_LP + refined_d2[1] .* v_LP
     Y_LP = refined_d1[2] .* u_LP + refined_d2[2] .* v_LP
 
-    signal = @showprogress pmap((x, y) -> spectral_bulk(energy, Location(x, y), s), us, vs)
+    signal = pmap((x, y) -> spectral_bulk(energy, Location(x, y), s), us, vs)
 
     fig = Figure(resolution = (1800, 1800))
     ax =
@@ -38,7 +39,7 @@ function plotter_func(energy::Float64)
             ylabelpadding = 0,
             xlabelsize = 50,
             ylabelsize = 50,
-            title = "FO map at $energy eV",
+            title = "CB model - $energy eV",
             titlefont = "Calculation/LibreBaskerville-Regular.ttf",
             titlesize = 60,
             xticklabelsize = 18,
@@ -71,25 +72,26 @@ function plotter_func(energy::Float64)
         ax,
         X_LP .* a0 / 10,
         Y_LP .* a0 / 10,
-        marker = :x,
-        markersize = 20,
+        marker = :circle,
+        markersize = 58,
         # markersize = 10,
-        color = :black ,
-        strokewidth = 0.3,
+        color = :transparent ,
+        strokewidth = 6,
+        strokecolor = :white
     )
 
-    sc = CairoMakie.scatter!(
-        ax,
-        X_latt .* a0 / 10,
-        Y_latt .* a0 / 10,
-        strokewidth = 1.8,
-        marker = :hexagon,
-        # strokecolor = RGBA(1.0,1.0,1.0,0.25),
-        strokecolor = RGBA(0.0,0.0,0.0,0.25),
-        color = :transparent,
-        markersize = 180,
-        strokestyle = :dot
-        )
+    # sc = CairoMakie.scatter!(
+    #     ax,
+    #     X_latt .* a0 / 10,
+    #     Y_latt .* a0 / 10,
+    #     strokewidth = 1.8,
+    #     marker = :hexagon,
+    #     # strokecolor = RGBA(1.0,1.0,1.0,0.25),
+    #     strokecolor = RGBA(0.0,0.0,0.0,0.25),
+    #     color = :transparent,
+    #     markersize = 180,
+    #     strokestyle = :dot
+    #     )
 
 
 
@@ -97,12 +99,12 @@ function plotter_func(energy::Float64)
     CairoMakie.xlims!(ax, (-2.5, 2.5))
     CairoMakie.ylims!(ax, (-2.5, 2.5))
 
-    if energy < 0.0
-        name = lpad(Int(- energy * 1000),4, '0')
-        save("-$name map.png", fig)
-    elseif energy >= 0.0
-        name = lpad(Int(energy * 1000),4, '0')
-        save("$name map.png", fig)
+    if M_scatter
+        name = lpad(Int(round((band_edge_vb - energy) * 1000)),4, '0')
+        save("Decamer_$name.png", fig)
+    else
+        name = lpad(Int(round((band_edge_cb + energy) * 1000)),4, '0')
+        save("Decamer_$name.png", fig)
     end
     # fig
 
@@ -110,6 +112,6 @@ end
 
 
 ## Series of figures
-for ii in range(-0.8, -0.5, step = 0.02)
+for ii in range(-0.3, 0.75, step = 0.01)
     plotter_func(ii)
 end

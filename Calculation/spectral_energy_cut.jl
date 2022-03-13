@@ -5,24 +5,19 @@ if nprocs() < proc_number
     addprocs(proc_number - nprocs())
 end
 
-include("Findpeaks.jl")
 @everywhere include("Calculation/calc_settings.jl")
 
 ## Calculation
 dI_dV1 = @showprogress pmap(x -> spectral_bulk(x, Location(1,1), s), ωs)
 #
-dI_dV2 = @showprogress pmap(x -> spectral_bulk(x, Trimer.Center, s_trimer), ωs)
+dI_dV2 = @showprogress pmap(x -> spectral_bulk(x, Inverted_Trimer.Center, s_trimer), ωs)
 #
 dI_dV3 = @showprogress pmap(x -> spectral_bulk_average(x, [Hexamer.Center, Hexamer.Center + Location(-1,0), Hexamer.Center + Location(0,-1)], s_hexamer), ωs)
 
-# dI_dV4 = @showprogress pmap(x -> spectral_bulk_average(x, [Decamer.Center, Decamer.Center + Location(-1,0), Decamer.Center + Location(0, -1)], s_decamer), ωs)
-
-dI_dV4 = @showprogress pmap(x -> spectral_bulk_average(x, vcat(Decamer.Center, neighbors(Decamer.Center)), s_decamer), ωs)
+dI_dV4 = @showprogress pmap(x -> spectral_bulk_average(x, [Decamer.Center, Decamer.Center + Location(-1,0), Decamer.Center + Location(0, -1)], s_decamer), ωs)
 
 xs =  band_edge_vb .- ωs
-# peaks = findpeaks(dI_dV3, ωs, min_prom=0.0001)
-# println(sort(ωs[peaks], rev = true))
-# println(band_edge_vb .- sort(ωs[peaks], rev = true))
+
 ## Plotting
 fig = Figure(resolution = (1800, 1800))
 ax =

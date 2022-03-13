@@ -57,7 +57,7 @@ end
 Trimer = KeyLocations(Location(1,1), Location(4,1), Location(3,3))
 Hexamer = KeyLocations(Location(-2,-2), Location(4,-2), Location(2,2))
 Decamer = KeyLocations(Location(-5, -5), Location(4,-5), Location(1,1))
-Inverted_Trimer = KeyLocations(Location(-1,-1), Location(1,1), Location(1,-2))
+Inverted_Trimer = KeyLocations(Location(1,1), Location(1,-2), Location(-1,-1))
 
 # Fourier analysis
 function FT_component(qx, qy, ρ, XS, YS)

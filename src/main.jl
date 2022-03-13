@@ -1,7 +1,6 @@
 using DelimitedFiles
 using Distributed
 using LinearAlgebra
-using ProgressMeter
 using QuadGK
 using SpecialFunctions
 using Statistics
